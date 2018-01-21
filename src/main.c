@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "LightScheduler.h"
 
 int main(void)
 {
