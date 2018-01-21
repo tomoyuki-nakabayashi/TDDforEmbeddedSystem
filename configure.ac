@@ -21,6 +21,7 @@ AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for libraries.
 AC_CHECK_LIB([pthread], [pthread_create])
+PKG_CHECK_MODULES(EVDEV, [libevdev])
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdint.h])
