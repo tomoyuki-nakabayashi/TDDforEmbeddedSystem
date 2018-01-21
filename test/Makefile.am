@@ -15,6 +15,7 @@ gtest_CPPFLAGS = \
   -I$(top_srcdir)/test/googletest/googlemock \
   -I$(top_srcdir)/test/googletest/googlemock/include \
   -pthread \
+  -std=c++11 \
   @EVDEV_CFLAGS@ \
   -I$(top_srcdir)/src
 
