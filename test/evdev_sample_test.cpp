@@ -1,5 +1,7 @@
 // Copyright <2018> <Tomoyuki Nakabayashi>
 // This software is released under the MIT License, see LICENSE.
+//
+// You might exucute these tests as root user.
 
 #include <gtest/gtest.h>
 extern "C" {
@@ -21,21 +23,20 @@ protected:
   }
 };
 
-TEST_F(EvdevSampleTest, InputEventFileCanOpen) {
-  struct libevdev *dev = NULL;
+TEST_F(EvdevSampleTest, InputEventFileCanOpenAsRoot) {
+  struct libevdev *dev = nullptr;
   int fd = open("/dev/input/event2", O_RDONLY|O_NONBLOCK);
   int rc = libevdev_new_from_fd(fd, &dev);
 
-  // You might exucute the test as root user.
   EXPECT_GE(rc, 0);
 }
 
 TEST_F(EvdevSampleTest, ReturnsEAGAIN) {
-  struct libevdev *dev = NULL;
+  struct libevdev *dev = nullptr;
   int fd = open("/dev/input/event2", O_RDONLY|O_NONBLOCK);
   int rc = libevdev_new_from_fd(fd, &dev);
 
-  struct input_event ev;
+  struct input_event ev {};
   rc = libevdev_next_event(dev, LIBEVDEV_READ_FLAG_NORMAL, &ev);
   EXPECT_EQ(-EAGAIN, rc);
 }
