@@ -2,4 +2,4 @@
 
 ## requirements
 
-* libevdev (for Ubuntu apt-get install libevdev-dev)
+* libevdev-1.0 (for Ubuntu apt-get install libevdev-dev)
