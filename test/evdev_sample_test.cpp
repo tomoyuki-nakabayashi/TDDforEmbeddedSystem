@@ -42,7 +42,7 @@ class EvdevSampleTest : public ::testing::Test {
  protected:
     virtual void SetUp()
     {
-      fd_ = open("/dev/input/event2", O_RDONLY|O_NONBLOCK);
+      fd_ = open("/dev/input/event2", O_RDWR|O_NONBLOCK);
       int rc = libevdev_new_from_fd(fd_, &evdev_);
     }
 
@@ -51,6 +51,8 @@ class EvdevSampleTest : public ::testing::Test {
       // Flush all input events.
       input_event ev {};
       while(libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &ev) != -EAGAIN) {}
+      while(libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_SYNC, &ev) != -EAGAIN) {}
+      close(fd_);
     }
  protected:
     libevdev *evdev_;
@@ -83,15 +85,17 @@ TEST_F(EvdevSampleTest, SuccessCaptureEvent) {
   // write an event
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
   write_key_event(KEY_A, 1, fd_);
+  write_key_event(KEY_A, 0, fd_);
   t.join();
 
   EXPECT_EQ(1, ev_count);
 }
 
 TEST_F(EvdevSampleTest, HasEventPending) {
-  auto event_pending = std::async(std::launch::async, [this]{ while(libevdev_has_event_pending(evdev_) == 0) {} return 1;});
+  auto event_pending = std::async(std::launch::async, [this]{ while(libevdev_has_event_pending(evdev_) != 0) {} return 1;});
 
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  write_key_event(KEY_A, 1, fd_);
   write_key_event(KEY_A, 0, fd_);
 
   EXPECT_EQ(1, event_pending.get());
