@@ -77,15 +77,20 @@ static void write_key_event(int code, int value, int fd)
 }
 
 TEST_F(EvdevSampleTest, SuccessCaptureEvent) {
-  int ev_count = 0;
+  int ev_count {};
+  bool worker_stop {false};
   struct input_event ev {};
   // lambda that's result will change only when capturing an event
-  std::thread t {([&]{ while(ev_count == 0) {ev_count += (libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &ev) != -EAGAIN); }})};
+  std::thread t {([&]{ for(;;) {
+      if (worker_stop) return;
+      if (libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &ev) == LIBEVDEV_READ_STATUS_SUCCESS) ev_count++;
+    }})};
 
   // write an event
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
   write_key_event(KEY_A, 1, fd_);
   write_key_event(KEY_A, 0, fd_);
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  worker_stop = true;
   t.join();
 
   EXPECT_EQ(1, ev_count);
