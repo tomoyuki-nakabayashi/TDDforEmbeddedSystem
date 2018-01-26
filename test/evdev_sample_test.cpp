@@ -15,6 +15,14 @@ extern "C" {
 #include <errno.h>
 }
 
+bool operator==(const input_event lhs, const input_event rhs) {
+  return ((lhs.time.tv_sec == rhs.time.tv_sec)
+        && (lhs.time.tv_usec == rhs.time.tv_usec)
+        && (lhs.type == rhs.type)
+        && (lhs.code == rhs.code)
+        && (lhs.value == rhs.value));
+}
+
 namespace evdev_sample_test {
 class EvdevSampleOpenTest : public ::testing::Test {
  protected:
@@ -60,49 +68,35 @@ class EvdevSampleTest : public ::testing::Test {
 };
 
 TEST_F(EvdevSampleTest, ReturnsEAGAIN) {
-  struct input_event ev {};
+  input_event ev {};
   int actual = libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &ev);
   EXPECT_EQ(-EAGAIN, actual);
 }
 
-static void write_key_event(int code, int value, int fd)
+static input_event create_key_event(uint16_t code, int value)
 {
-  struct input_event key_event {};
-  
-  gettimeofday(&key_event.time, NULL);
-  key_event.type = EV_KEY;
-  key_event.code = code;
-  key_event.value = value;
-  write(fd, &key_event, sizeof(key_event));
+  timeval time {};
+  gettimeofday(&time, NULL);
+  return input_event {time, EV_KEY, code, value};
 }
 
 TEST_F(EvdevSampleTest, SuccessCaptureEvent) {
-  int ev_count {};
-  bool worker_stop {false};
-  struct input_event ev {};
-  // lambda that's result will change only when capturing an event
-  std::thread t {([&]{ for(;;) {
-      if (worker_stop) return;
-      if (libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &ev) == LIBEVDEV_READ_STATUS_SUCCESS) ev_count++;
-    }})};
+  auto expect = create_key_event(KEY_A, 0);
+  write(fd_, &expect, sizeof(expect));
 
-  // write an event
-  write_key_event(KEY_A, 1, fd_);
-  write_key_event(KEY_A, 0, fd_);
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  worker_stop = true;
-  t.join();
+  input_event actual {};
+  while (libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &actual) == LIBEVDEV_READ_STATUS_SUCCESS) {}
 
-  EXPECT_EQ(1, ev_count);
+  EXPECT_EQ(expect, actual);
 }
 
 TEST_F(EvdevSampleTest, HasEventPending) {
-  auto event_pending = std::async(std::launch::async, [this]{ while(libevdev_has_event_pending(evdev_) != 0) {} return 1;});
+  auto event_pending = std::async(std::launch::async, [this]{ 
+    while(libevdev_has_event_pending(evdev_) != 0) {} return true;
+  });
+  auto event = create_key_event(KEY_A, 0);
+  write(fd_, &event, sizeof(event));
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  write_key_event(KEY_A, 1, fd_);
-  write_key_event(KEY_A, 0, fd_);
-
-  EXPECT_EQ(1, event_pending.get());
+  EXPECT_TRUE(event_pending.get());
 }
 }  // namespace evdev_sample_test
