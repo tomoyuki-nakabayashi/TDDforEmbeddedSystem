@@ -52,6 +52,7 @@ class EvdevSampleTest : public ::testing::Test {
     {
       fd_ = open("/dev/input/event2", O_RDWR|O_NONBLOCK);
       int rc = libevdev_new_from_fd(fd_, &evdev_);
+      input_event ev {};
     }
 
     virtual void TearDown()
@@ -81,12 +82,25 @@ static input_event create_key_event(uint16_t code, int value)
 }
 
 TEST_F(EvdevSampleTest, SuccessCaptureEvent) {
-  auto expect = create_key_event(KEY_A, 0);
-  write(fd_, &expect, sizeof(expect));
-
   input_event actual {};
-  while (libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &actual) == LIBEVDEV_READ_STATUS_SUCCESS) {}
-
+  while (true) {
+    int rc = libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &actual);
+    if ((rc == LIBEVDEV_READ_STATUS_SUCCESS) && actual.type == EV_KEY) break;
+  }
+  // write an event
+  auto expect = create_key_event(KEY_A, 1);
+  write(fd_, &expect, sizeof(expect));
+  // lambda that's result will change only when capturing an event
+/*   auto result = [&]()->input_event {
+    input_event actual {};
+    while (libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &actual) != LIBEVDEV_READ_STATUS_SUCCESS) {}
+    return actual;
+  };
+ */
+  while (true) {
+    int rc = libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &actual);
+    if ((rc == LIBEVDEV_READ_STATUS_SUCCESS) && actual.type == EV_KEY) break;
+  }
   EXPECT_EQ(expect, actual);
 }
 
