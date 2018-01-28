@@ -4,9 +4,6 @@
 // You might exucute these tests as root user.
 
 #include <gtest/gtest.h>
-#include <thread>
-#include <chrono>
-#include <future>
 extern "C" {
 #include <libevdev/libevdev.h>
 #include <linux/input.h>
@@ -16,9 +13,7 @@ extern "C" {
 }
 
 bool operator==(const input_event lhs, const input_event rhs) {
-  return ((lhs.time.tv_sec == rhs.time.tv_sec)
-        && (lhs.time.tv_usec == rhs.time.tv_usec)
-        && (lhs.type == rhs.type)
+  return ((lhs.type == rhs.type)
         && (lhs.code == rhs.code)
         && (lhs.value == rhs.value));
 }
@@ -50,7 +45,7 @@ class EvdevSampleTest : public ::testing::Test {
  protected:
     virtual void SetUp()
     {
-      fd_ = open("/dev/input/event2", O_RDWR|O_NONBLOCK);
+      fd_ = open("/dev/input/event2", O_RDONLY|O_NONBLOCK);
       int rc = libevdev_new_from_fd(fd_, &evdev_);
       input_event ev {};
     }
@@ -68,6 +63,9 @@ class EvdevSampleTest : public ::testing::Test {
     int fd_;
 };
 
+constexpr int KEY_RELEASED = 0;
+constexpr int KEY_PRESSED = 1;
+
 TEST_F(EvdevSampleTest, ReturnsEAGAIN) {
   input_event ev {};
   int actual = libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &ev);
@@ -81,36 +79,14 @@ static input_event create_key_event(uint16_t code, int value)
   return input_event {time, EV_KEY, code, value};
 }
 
-TEST_F(EvdevSampleTest, SuccessCaptureEvent) {
+TEST_F(EvdevSampleTest, CaptureEnterKeyPress) {
+  auto expect = create_key_event(KEY_ENTER, KEY_PRESSED);
   input_event actual {};
   while (true) {
     int rc = libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &actual);
-    if ((rc == LIBEVDEV_READ_STATUS_SUCCESS) && actual.type == EV_KEY) break;
+    if ((rc == LIBEVDEV_READ_STATUS_SUCCESS) && actual == expect) break;
   }
-  // write an event
-  auto expect = create_key_event(KEY_A, 1);
-  write(fd_, &expect, sizeof(expect));
-  // lambda that's result will change only when capturing an event
-/*   auto result = [&]()->input_event {
-    input_event actual {};
-    while (libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &actual) != LIBEVDEV_READ_STATUS_SUCCESS) {}
-    return actual;
-  };
- */
-  while (true) {
-    int rc = libevdev_next_event(evdev_, LIBEVDEV_READ_FLAG_NORMAL, &actual);
-    if ((rc == LIBEVDEV_READ_STATUS_SUCCESS) && actual.type == EV_KEY) break;
-  }
+
   EXPECT_EQ(expect, actual);
-}
-
-TEST_F(EvdevSampleTest, HasEventPending) {
-  auto event_pending = std::async(std::launch::async, [this]{ 
-    while(libevdev_has_event_pending(evdev_) != 0) {} return true;
-  });
-  auto event = create_key_event(KEY_A, 0);
-  write(fd_, &event, sizeof(event));
-
-  EXPECT_TRUE(event_pending.get());
 }
 }  // namespace evdev_sample_test
