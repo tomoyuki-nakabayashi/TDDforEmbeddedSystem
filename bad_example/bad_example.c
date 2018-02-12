@@ -11,12 +11,15 @@
 #include <stdbool.h>
 #include <string.h>
 
+#define KEYBOARD_DEVICE "/dev/input/event2"
+#define LED_DEVICE      "/sys/class/leds/input2::capslock/brightness"
+
 #define KEY_RELEASED 0
 #define KEY_PRESSED 1
 
 static void mainloop() {
 struct libevdev *dev = NULL;
-  int key_fd = open("/dev/input/event2", O_RDONLY|O_NONBLOCK);
+  int key_fd = open(KEYBOARD_DEVICE, O_RDONLY|O_NONBLOCK);
   int rc = libevdev_new_from_fd(key_fd, &dev);
 
   if (rc < 0) {
@@ -24,7 +27,7 @@ struct libevdev *dev = NULL;
     exit(1);
   }
 
-  int led_fd = open("/sys/class/leds/input2::capslock/brightness", O_WRONLY|O_NONBLOCK);
+  int led_fd = open(LED_DEVICE, O_WRONLY|O_NONBLOCK);
   if (led_fd < 0) {
     fprintf(stderr, "Failed to init LED device.\n");
     exit(1);
