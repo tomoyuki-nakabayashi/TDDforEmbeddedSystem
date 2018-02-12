@@ -43,6 +43,10 @@ struct libevdev *dev = NULL;
       }
     }
   } while (rc == 1 || rc == 0 || rc == -EAGAIN);
+
+  libevdev_free(dev);
+  close(key_fd);
+  close(led_fd);
 }
 
 int main() {
