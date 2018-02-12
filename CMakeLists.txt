@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(evdev_test)
+project(tdd_for_embedded)
 enable_language(CXX)
 set(CMAKE_CXX_STANDARD 11) # C++11...
 set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
@@ -45,3 +45,4 @@ pkg_check_modules(LIBEVDEV REQUIRED libevdev)
 include_directories(${LIBEVDEV_INCLUDE_DIRS})
 
 add_subdirectory(evdev_test)
+add_subdirectory(bad_example)

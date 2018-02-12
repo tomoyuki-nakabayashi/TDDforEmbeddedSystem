@@ -1,13 +1,19 @@
 
-Expectation: 01-00, but 04-00
+# LED
 
-Expected equality of these values:
-  expect
-    Which is: 24-byte object <D1-FA 6B-5A 00-00 00-00 BE-90 05-00 00-00 00-00 01-00 1E-00 00-00 00-00>
-  actual
-    Which is: 24-byte object <D1-FA 6B-5A 00-00 00-00 9B-F2 06-00 00-00 00-00 04-00 04-00 1C-00 00-00>
+```
+sudo sh -c "echo 0 > /sys/class/leds/input2\:\:capslock/brightness"
+```
 
-#define EV_MSC			0x04
-
-* EV_MSC:
-  - Used to describe miscellaneous input data that do not fit into other types.
+cat /proc/bus/input/devices
+I: Bus=0011 Vendor=0001 Product=0001 Version=ab41
+N: Name="AT Translated Set 2 keyboard"
+P: Phys=isa0060/serio0/input0
+S: Sysfs=/devices/platform/i8042/serio0/input/input2
+U: Uniq=
+H: Handlers=sysrq kbd event2 leds
+B: PROP=0
+B: EV=120013
+B: KEY=402000000 3803078f800d001 feffffdfffefffff fffffffffffffffe
+B: MSC=10
+B: LED=7
