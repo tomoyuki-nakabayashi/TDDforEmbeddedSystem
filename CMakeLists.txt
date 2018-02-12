@@ -1,4 +1,11 @@
 cmake_minimum_required(VERSION 2.8)
+enable_language(CXX)
+set(CMAKE_CXX_STANDARD 11) # C++11...
+set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
+set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-long-long -pedantic -std=c++11")
+find_package(Threads REQUIRED)
+
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
@@ -36,8 +43,4 @@ find_package(PkgConfig)
 pkg_check_modules(LIBEVDEV REQUIRED libevdev)
 include_directories(${LIBEVDEV_INCLUDE_DIRS})
 
-# Now simply link against gtest or gtest_main as needed. Eg
-add_executable(example test/evdev_sample_test.cpp)
-target_link_libraries(example gtest_main, ${LIBEVDEV_LIBRARIES})
-add_test(NAME example_test COMMAND example)
-
+add_subdirectory(evdev_test)
