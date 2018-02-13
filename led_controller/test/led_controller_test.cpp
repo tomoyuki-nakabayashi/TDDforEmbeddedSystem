@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 namespace led_controller_test {
-class KeyInputEventTest : public ::testing::Test {
+class LedControllerTest : public ::testing::Test {
  protected:
     virtual void SetUp()
     {
@@ -15,15 +15,19 @@ class KeyInputEventTest : public ::testing::Test {
     }
 };
 
-TEST_F(KeyInputEventTest, AbstractUse) {
-  EXPECT_TRUE(InitKeyInputDevice("path to device file."));
+TEST_F(LedControllerTest, AbstractUse) {
+  InitKeyInputDevice("path to key input device.");
+  InitLedDevice("path to led device.")
   SetKeyInputEventWatcher(condition);
 
-  for (int i = 0; i < 10; i++)
-    EXPECT_FALSE(EventDetected());
-  EXPECT_TRUE(EventDetected());
+  while (1) {
+    if (EventDetected()) {
+      ToggleLedDevice();
+    }
+  }
 
-  EXPECT_TRUE(FinalizeKeyInputDevice());
+  FinalizeKeyInputDevice();
+  FinalizeLedDevice();
 }
 
 }  // namespace led_controller_test

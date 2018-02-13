@@ -1,8 +1,12 @@
 # To Do List
 
+## LED Controller
+
+- [x] Consider top-level absctract use.
+
 ## Key input event
 
-- [ ] Make abstract use.
+- [x] Make abstract use.
 - [ ] Initialize input device.
 - [ ] Finalize input device.
 - [ ] Detect 'A' pressed.
