@@ -6,6 +6,7 @@
 - [ ] Initialize input device.
 - [ ] Finalize input device.
 - [ ] Detect 'A' pressed.
+- [ ] Are multiple instance required ?
 
 ## LED Brightness
 
