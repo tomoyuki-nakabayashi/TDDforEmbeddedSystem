@@ -28,7 +28,7 @@ TEST_F(KeyInputEventTest, AbstractUse) {
 }
 */
 
-TEST_F(KeyInputEventTest, InitKeyInputDevice) {
+TEST_F(KeyInputEventTest, CanInitInputDevice) {
   EXPECT_TRUE(InitKeyInputDevice());
 }
 }  // namespace led_controller_test
