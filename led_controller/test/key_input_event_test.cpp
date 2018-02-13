@@ -2,6 +2,7 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <gtest/gtest.h>
+#include <key_input_event.h>
 
 namespace led_controller_test {
 class KeyInputEventTest : public ::testing::Test {
@@ -14,7 +15,7 @@ class KeyInputEventTest : public ::testing::Test {
     {
     }
 };
-
+/* 
 TEST_F(KeyInputEventTest, AbstractUse) {
   EXPECT_TRUE(InitKeyInputDevice("path to device file."));
   SetKeyInputEventWatcher(condition);
@@ -25,5 +26,9 @@ TEST_F(KeyInputEventTest, AbstractUse) {
 
   EXPECT_TRUE(FinalizeKeyInputDevice());
 }
+*/
 
+TEST_F(KeyInputEventTest, InitKeyInputDevice) {
+  EXPECT_TRUE(InitKeyInputDevice("/dev/input/event2"));
+}
 }  // namespace led_controller_test

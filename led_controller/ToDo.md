@@ -8,6 +8,7 @@
 
 - [x] Make abstract use.
 - [ ] Initialize input device.
+  - [x] Initialize returns true.
 - [ ] Finalize input device.
 - [ ] Detect 'A' pressed.
 - [ ] Are multiple instance required ?
