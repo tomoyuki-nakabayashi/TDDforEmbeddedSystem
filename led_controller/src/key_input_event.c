@@ -3,6 +3,8 @@
 
 #include <key_input_event.h>
 
-bool InitKeyInputDevice(const char* path) {
+#define DEVICE_FILE "/dev/input/event2"
+
+bool InitKeyInputDevice() {
   return true;
 }

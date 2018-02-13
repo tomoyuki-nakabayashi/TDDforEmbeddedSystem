@@ -10,7 +10,7 @@ extern "C" {
 
 #include <stdbool.h>
 
-bool InitKeyInputDevice(const char* path);
+bool InitKeyInputDevice();
 
 #ifdef __cplusplus
 }
