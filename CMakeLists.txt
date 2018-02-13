@@ -46,3 +46,4 @@ include_directories(${LIBEVDEV_INCLUDE_DIRS})
 
 add_subdirectory(evdev_test)
 add_subdirectory(bad_example)
+add_subdirectory(led_controller)
