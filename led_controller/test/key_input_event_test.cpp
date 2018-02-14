@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <key_input_event.h>
+#include <fstream>
 
 namespace led_controller_test {
 class KeyInputEventTest : public ::testing::Test {
@@ -18,7 +19,7 @@ class KeyInputEventTest : public ::testing::Test {
 /* 
 TEST_F(KeyInputEventTest, AbstractUse) {
   EXPECT_TRUE(InitKeyInputDevice("path to device file."));
-  SetKeyInputEventWatcher(condition);
+  SetKeyInputEventListener(condition);
 
   for (int i = 0; i < 10; i++)
     EXPECT_FALSE(EventDetected());
@@ -29,6 +30,12 @@ TEST_F(KeyInputEventTest, AbstractUse) {
 */
 
 TEST_F(KeyInputEventTest, CanInitInputDevice) {
-  EXPECT_TRUE(InitKeyInputDevice());
+  std::ofstream("./test_event");
+  EXPECT_TRUE(InitKeyInputDevice("./test_event"));
+  std::remove("./test_event");
+}
+
+TEST_F(KeyInputEventTest, FailToInitInputDevice) {
+  EXPECT_FALSE(InitKeyInputDevice("/dev/input/not_found"));
 }
 }  // namespace led_controller_test

@@ -7,8 +7,9 @@
 ## Key input event
 
 - [x] Make abstract use.
-- [ ] Initialize input device.
+- [x] Initialize input device.
   - [x] Initialize returns true.
+  - [x] Initialize returns false.
 - [ ] Finalize input device.
 - [ ] Detect 'A' pressed.
 - [ ] Are multiple instance required ?
