@@ -6,8 +6,9 @@
 #include <assert.h>
 
 bool InitKeyInputDevice(const char *device_file) {
-  int fd = open(device_file, O_RDONLY|O_NONBLOCK);
+  int fd = IO_OPEN(device_file, O_RDONLY|O_NONBLOCK);
   assert(!(fd < 0));
+  if (fd < 0) return false;
 
   return true;
 }
