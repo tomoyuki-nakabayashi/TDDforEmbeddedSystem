@@ -36,6 +36,6 @@ TEST_F(KeyInputEventTest, CanInitInputDevice) {
 }
 
 TEST_F(KeyInputEventTest, FailToInitInputDevice) {
-  EXPECT_FALSE(InitKeyInputDevice("/dev/input/not_found"));
+  EXPECT_DEATH(InitKeyInputDevice("/dev/input/not_found"), "");
 }
 }  // namespace led_controller_test
