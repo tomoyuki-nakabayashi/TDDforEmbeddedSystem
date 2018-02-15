@@ -4,16 +4,21 @@
 #include <gtest/gtest.h>
 #include <key_input_event.h>
 #include <fstream>
+#include <os/mock_io.h>
+
+MOCK_IO *mock_io {};
 
 namespace led_controller_test {
 class KeyInputEventTest : public ::testing::Test {
  protected:
     virtual void SetUp()
     {
+      mock_io = new MOCK_IO {};
     }
 
     virtual void TearDown()
     {
+      delete mock_io;
     }
 };
 /* 

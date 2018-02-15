@@ -4,6 +4,7 @@
 #include <key_input_event.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <os/io.h>
 
 bool InitKeyInputDevice(const char *device_file) {
   int fd = IO_OPEN(device_file, O_RDONLY|O_NONBLOCK);
