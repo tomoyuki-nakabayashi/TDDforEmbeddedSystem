@@ -9,15 +9,22 @@
 MOCK_IO *mock_io {};
 
 namespace led_controller_test {
+using ::testing::Return;
+using ::testing::_;
+using ::testing::DoAll;
+using ::testing::Invoke;
+
 class KeyInputEventTest : public ::testing::Test {
  protected:
     virtual void SetUp()
     {
       mock_io = new MOCK_IO {};
+      errno = 0;
     }
 
     virtual void TearDown()
     {
+      errno = 0;
       delete mock_io;
     }
 };
@@ -35,12 +42,14 @@ TEST_F(KeyInputEventTest, AbstractUse) {
 */
 
 TEST_F(KeyInputEventTest, CanInitInputDevice) {
-  std::ofstream("./test_event");
+  EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
   EXPECT_TRUE(InitKeyInputDevice("./test_event"));
-  std::remove("./test_event");
 }
 
 TEST_F(KeyInputEventTest, FailToInitInputDevice) {
-  EXPECT_DEATH(InitKeyInputDevice("/dev/input/not_found"), "");
+  EXPECT_CALL(*mock_io, IO_OPEN(_, _))
+    .WillOnce(Invoke([](const char*, int) {
+      errno = EACCES; return -1; }));
+  EXPECT_FALSE(InitKeyInputDevice("./file_not_found"));
 }
 }  // namespace led_controller_test
