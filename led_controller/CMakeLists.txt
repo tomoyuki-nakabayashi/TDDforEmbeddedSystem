@@ -3,4 +3,4 @@ include_directories(src test/mocks)
 add_executable(unittests
     src/key_input_event.c
     test/key_input_event_test.cpp)
-target_link_libraries(unittests gtest_main)
+target_link_libraries(unittests gmock_main)
