@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <os/io.h>
+#include <utils/logger.h>
 
 bool InitKeyInputDevice(const char *device_file) {
   int fd = IO_OPEN(device_file, O_RDONLY|O_NONBLOCK);
