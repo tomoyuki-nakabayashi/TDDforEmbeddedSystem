@@ -10,7 +10,7 @@
 - [x] Initialize input device.
   - [x] Initialize returns true.
   - [x] Initialize returns false.
-  - [ ] Return enum.
+  - [ ] Output permisiion denied.
 - [ ] Finalize input device.
 - [ ] Detect 'A' pressed.
 - [ ] Are multiple instance required ?

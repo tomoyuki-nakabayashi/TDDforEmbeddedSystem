@@ -50,11 +50,19 @@ TEST_F(KeyInputEventTest, CanInitInputDevice) {
 }
 
 TEST_F(KeyInputEventTest, FailToInitInputDevice) {
+  EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
+    Invoke([](const char*, int) { errno = ENOENT; return -1; }));
+  EXPECT_FALSE(InitKeyInputDevice("./file_not_found"));
+}
+
+TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
   std::unique_ptr<char[]> spy {new char[128]};
   set_DEBUG_LOG_spy(spy.get(), 128);
+
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
     Invoke([](const char*, int) { errno = EACCES; return -1; }));
-  EXPECT_FALSE(InitKeyInputDevice("./file_not_found"));
+
+  EXPECT_FALSE(InitKeyInputDevice("./test_event"));
   EXPECT_STREQ("Fail to open file. You may need root permission.",
                spy.get());
 }
