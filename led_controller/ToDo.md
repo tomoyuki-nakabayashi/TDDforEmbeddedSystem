@@ -7,10 +7,12 @@
 ## Key input event
 
 - [x] Make abstract use.
-- [x] Initialize input device.
+- [ ] Initialize input device.
+  - [x] Open input device file.
   - [x] Initialize returns true.
   - [x] Initialize returns false.
-  - [ ] Output permisiion denied.
+  - [x] Output permisiion denied.
+  - [ ] Initialize libevdev.
 - [ ] Finalize input device.
 - [ ] Detect 'A' pressed.
 - [ ] Are multiple instance required ?
