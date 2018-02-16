@@ -4,7 +4,6 @@
 #include <key_input_event.h>
 
 int main(void) {
-  //InitKeyInputDevice("/dev/input/event2");
-  InitKeyInputDevice("/dev/input/not_found");
+  InitKeyInputDevice("/dev/input/event2");
   return 0;
 }
