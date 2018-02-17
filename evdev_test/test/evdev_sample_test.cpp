@@ -38,6 +38,14 @@ TEST_F(EvdevSampleOpenTest, InputEventFileCanOpenAsRoot) {
   EXPECT_GE(rc, 0);
 }
 
+TEST_F(EvdevSampleOpenTest, TestEvdevErrorAsNonRoot) {
+  struct libevdev *dev {nullptr};
+  int fd = open("/dev/input/event2", O_RDONLY|O_NONBLOCK);
+  int rc = libevdev_new_from_fd(fd, &dev);
+
+  EXPECT_EQ(-EBADF, rc);
+}
+
 class EvdevSampleTest : public ::testing::Test {
  public:
     EvdevSampleTest(): evdev_{nullptr}, fd_{} {}
