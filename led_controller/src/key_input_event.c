@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <assert.h>
 #include <errno.h>
+#include <stddef.h>
+#include <libevdev/libevdev.h>
 #include <os/io.h>
 #include <utils/logger.h>
 
@@ -15,6 +17,9 @@ bool InitKeyInputDevice(const char *device_file) {
       DEBUG_LOG("Fail to open file. You may need root permission.");
     return false;
   }
+
+  struct libevdev *evdev = NULL;
+  libevdev_new_from_fd(fd, &evdev);
 
   return true;
 }

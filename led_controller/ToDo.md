@@ -12,7 +12,8 @@
   - [x] Initialize returns true.
   - [x] Initialize returns false.
   - [x] Output permisiion denied.
-  - [ ] Initialize libevdev.
+  - [x] Initialize libevdev.
+  - [ ] Add failure case of initializing libevdev.
 - [ ] Finalize input device.
 - [ ] Detect 'A' pressed.
 - [ ] Are multiple instance required ?

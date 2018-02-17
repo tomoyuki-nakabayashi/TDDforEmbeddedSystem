@@ -7,9 +7,11 @@
 #include <memory>
 #include <os/mock_io.h>
 #include <utils/logger_spy.h>
+#include <libs/mock_libevdev.h>
 #include <errno.h>
 
 MOCK_IO *mock_io {};
+MOCK_LIBEVDEV *mock_libevdev {};
 
 namespace led_controller_test {
 using ::testing::Return;
@@ -22,12 +24,14 @@ class KeyInputEventTest : public ::testing::Test {
     virtual void SetUp()
     {
       mock_io = new MOCK_IO {};
+      mock_libevdev = new MOCK_LIBEVDEV {};
       errno = 0;
     }
 
     virtual void TearDown()
     {
       errno = 0;
+      delete mock_libevdev;
       delete mock_io;
     }
 };
@@ -65,5 +69,14 @@ TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
   EXPECT_FALSE(InitKeyInputDevice("./test_event"));
   EXPECT_STREQ("Fail to open file. You may need root permission.",
                spy.get());
+}
+
+TEST_F(KeyInputEventTest, CanInitEvdev) {
+  const int kFd = 3;
+  EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(kFd, _))
+    .WillOnce(Return(1));
+
+  EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(kFd));
+  EXPECT_TRUE(InitKeyInputDevice("./test_event"));
 }
 }  // namespace led_controller_test
