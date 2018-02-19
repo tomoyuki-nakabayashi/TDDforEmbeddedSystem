@@ -48,9 +48,11 @@ TEST_F(KeyInputEventTest, AbstractUse) {
 }
 */
 
+static constexpr char kFilePath[]  {"/dev/input/event2"};
+
 TEST_F(KeyInputEventTest, CanInitInputDevice) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
-  EXPECT_TRUE(InitKeyInputDevice("./test_event"));
+  EXPECT_TRUE(InitKeyInputDevice(kFilePath));
 }
 
 TEST_F(KeyInputEventTest, FailToInitInputDevice) {
@@ -66,7 +68,7 @@ TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
     Invoke([](const char*, int) { errno = EACCES; return -1; }));
 
-  EXPECT_FALSE(InitKeyInputDevice("./test_event"));
+  EXPECT_FALSE(InitKeyInputDevice(kFilePath));
   EXPECT_STREQ("Fail to open file. You may need root permission.",
                spy.get());
 }
@@ -77,20 +79,20 @@ TEST_F(KeyInputEventTest, CanInitEvdev) {
     .WillOnce(Return(0));
 
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(kFileDescriptor));
-  EXPECT_TRUE(InitKeyInputDevice("./test_event"));
+  EXPECT_TRUE(InitKeyInputDevice(kFilePath));
 }
 
 TEST_F(KeyInputEventTest, InitEvdevFailed) {
   EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(_, _))
     .WillOnce(Return(-EBADF));
 
-  EXPECT_FALSE(InitKeyInputDevice("./test_event"));
+  EXPECT_FALSE(InitKeyInputDevice(kFilePath));
 }
 
 TEST_F(KeyInputEventTest, CleanupKeyInputDevice) {
   EXPECT_FALSE(CleanupKeyInputDevice());
 
-  InitKeyInputDevice();
+  InitKeyInputDevice(kFilePath);
   EXPECT_TRUE(CleanupKeyInputDevice());
 
   EXPECT_FALSE(CleanupKeyInputDevice());
