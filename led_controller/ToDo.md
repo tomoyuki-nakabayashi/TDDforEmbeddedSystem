@@ -7,16 +7,17 @@
 ## Key input event
 
 - [x] Make abstract use.
-- [ ] Initialize input device.
+- [x] Initialize input device.
   - [x] Open input device file.
   - [x] Initialize returns true.
   - [x] Initialize returns false.
   - [x] Output permisiion denied.
   - [x] Initialize libevdev.
-  - [ ] Add failure case of initializing libevdev.
+  - [x] Add failure case of initializing libevdev.
 - [ ] Finalize input device.
 - [ ] Detect 'A' pressed.
 - [ ] Are multiple instance required ?
+- [ ] evdev operation fails after cleanup().
 
 ## LED Brightness
 

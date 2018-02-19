@@ -10,14 +10,18 @@
 class MOCK_LIBEVDEV {
  public:
     MOCK_METHOD2(libevdev_new_from_fd, int(int, libevdev**));
+    MOCK_METHOD1(libevdev_free, void(libevdev**));
 };
 
 extern MOCK_LIBEVDEV *mock_libevdev;
 
 extern "C" {
-  int libevdev_new_from_fd(int fd, libevdev **dev)
-  {
+  int libevdev_new_from_fd(int fd, libevdev **dev) {
     return mock_libevdev->libevdev_new_from_fd(fd, dev);
+  }
+
+  void libevdev_free(libevdev **dev) {
+    return mock_libevdev->libevdev_free(dev);
   }
 }
 

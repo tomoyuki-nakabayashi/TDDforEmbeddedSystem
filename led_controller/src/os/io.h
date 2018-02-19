@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 int IO_OPEN(const char *pathname, int flags);
+int IO_CLOSE(int fd);
 
 #ifdef __cplusplus
 }

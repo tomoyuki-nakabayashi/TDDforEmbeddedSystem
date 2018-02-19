@@ -10,16 +10,26 @@
 #include <os/io.h>
 #include <utils/logger.h>
 
+static int fd = 0;
+static struct libevdev *evdev = NULL;
+
 bool InitKeyInputDevice(const char *device_file) {
-  int fd = IO_OPEN(device_file, O_RDONLY|O_NONBLOCK);
+  fd = IO_OPEN(device_file, O_RDONLY|O_NONBLOCK);
   if (fd < 0) {
     if (errno == EACCES)
       DEBUG_LOG("Fail to open file. You may need root permission.");
     return false;
   }
 
-  struct libevdev *evdev = NULL;
   int rc = libevdev_new_from_fd(fd, &evdev);
+  if (rc < 0) return false;
+
+  return true;
+}
+
+bool CleanupKeyInputDevice() {
+  libevdev_free(evdev);
+  int rc = close(fd);
   if (rc < 0) return false;
 
   return true;

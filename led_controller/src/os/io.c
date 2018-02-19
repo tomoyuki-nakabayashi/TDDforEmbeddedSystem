@@ -7,3 +7,7 @@
 int IO_OPEN(const char *pathname, int flags) {
   return open(pathname, flags);
 }
+
+int IO_CLOSE(int fd) {
+  return close(fd);
+}

@@ -86,4 +86,14 @@ TEST_F(KeyInputEventTest, InitEvdevFailed) {
 
   EXPECT_FALSE(InitKeyInputDevice("./test_event"));
 }
+
+TEST_F(KeyInputEventTest, CleanupKeyInputDevice) {
+  EXPECT_FALSE(CleanupKeyInputDevice());
+
+  InitKeyInputDevice();
+  EXPECT_TRUE(CleanupKeyInputDevice());
+
+  EXPECT_FALSE(CleanupKeyInputDevice());
+}
+
 }  // namespace led_controller_test
