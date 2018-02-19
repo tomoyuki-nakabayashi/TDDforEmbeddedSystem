@@ -72,13 +72,18 @@ TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
 }
 
 TEST_F(KeyInputEventTest, CanInitEvdev) {
-  const int kFd = 3;
-  EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(kFd, _))
+  const int kFileDescriptor = 3;
+  EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(kFileDescriptor, _))
     .WillOnce(Return(0));
 
-  EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(kFd));
+  EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(kFileDescriptor));
   EXPECT_TRUE(InitKeyInputDevice("./test_event"));
 }
 
+TEST_F(KeyInputEventTest, InitEvdevFailed) {
+  EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(_, _))
+    .WillOnce(Return(-EBADF));
 
+  EXPECT_FALSE(InitKeyInputDevice("./test_event"));
+}
 }  // namespace led_controller_test

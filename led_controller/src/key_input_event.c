@@ -19,7 +19,8 @@ bool InitKeyInputDevice(const char *device_file) {
   }
 
   struct libevdev *evdev = NULL;
-  libevdev_new_from_fd(fd, &evdev);
+  int rc = libevdev_new_from_fd(fd, &evdev);
+  if (rc < 0) return false;
 
   return true;
 }
