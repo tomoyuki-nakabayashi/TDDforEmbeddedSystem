@@ -17,6 +17,7 @@
 - [ ] Finalize input device.
 - [ ] Detect 'A' pressed.
 - [ ] Are multiple instance required ?
+- [ ] Move specific struct definition into private header.
 - [ ] evdev operation fails after cleanup().
 
 ## LED Brightness
