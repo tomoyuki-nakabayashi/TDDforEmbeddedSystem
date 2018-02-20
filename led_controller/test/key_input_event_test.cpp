@@ -51,6 +51,7 @@ TEST_F(KeyInputEventTest, AbstractUse) {
 static constexpr char kFilePath[]  {"/dev/input/event2"};
 
 TEST_F(KeyInputEventTest, CanInitInputDevice) {
+  CreateKeyInputDevice();
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
   EXPECT_TRUE(InitKeyInputDevice(kFilePath));
 }
@@ -89,13 +90,27 @@ TEST_F(KeyInputEventTest, InitEvdevFailed) {
   EXPECT_FALSE(InitKeyInputDevice(kFilePath));
 }
 
-TEST_F(KeyInputEventTest, CleanupKeyInputDevice) {
-  EXPECT_FALSE(CleanupKeyInputDevice());
+static void InitHelper(const char *path, int fd, int res_evdev_new) {
+  EXPECT_CALL(*mock_io, IO_OPEN(path, _)).WillOnce(Return(fd));
+  EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(fd, _))
+    .WillOnce(Return(res_evdev_new));
 
-  InitKeyInputDevice(kFilePath);
+  InitKeyInputDevice(path);
+}
+
+TEST_F(KeyInputEventTest, CanCleanupKeyInputDevice) {
+  constexpr int kFd = 3;
+  InitHelper(kFilePath, kFd, 0);
+
+  EXPECT_CALL(*mock_libevdev, libevdev_free(_)).Times(1);
+  EXPECT_CALL(*mock_io, IO_CLOSE(kFd)).WillOnce(Return(0));
+
   EXPECT_TRUE(CleanupKeyInputDevice());
+}
+
+TEST_F(KeyInputEventTest, CleanupKeyInputDevice) {
+  EXPECT_CALL(*mock_io, IO_CLOSE(-1)).WillRepeatedly(Return(-1));
 
   EXPECT_FALSE(CleanupKeyInputDevice());
 }
-
 }  // namespace led_controller_test

@@ -3,6 +3,7 @@
 
 #include <os/io.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 int IO_OPEN(const char *pathname, int flags) {
   return open(pathname, flags);
