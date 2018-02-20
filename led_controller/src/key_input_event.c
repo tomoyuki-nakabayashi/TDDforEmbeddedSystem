@@ -20,13 +20,15 @@ KeyInputDevice CreateKeyInputDevice() {
 }
 
 void DestroyKeyInputDevice(KeyInputDevice dev) {
-  if(!dev) {
-    free(dev);
-    dev = NULL;
-  }
+  if(dev == NULL) return;
+
+  free(dev);
+  dev = NULL;
 }
 
 bool InitKeyInputDevice(KeyInputDevice dev, const char *device_file) {
+  if(dev == NULL) return false;
+
   dev->fd = IO_OPEN(device_file, O_RDONLY|O_NONBLOCK);
   if (dev->fd < 0) {
     if (errno == EACCES)
@@ -41,6 +43,8 @@ bool InitKeyInputDevice(KeyInputDevice dev, const char *device_file) {
 }
 
 bool CleanupKeyInputDevice(KeyInputDevice dev) {
+  if(dev == NULL) return false;
+
   libevdev_free(dev->evdev);
   int rc = IO_CLOSE(dev->fd);
   if (rc < 0) return false;

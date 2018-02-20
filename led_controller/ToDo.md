@@ -14,10 +14,11 @@
   - [x] Output permisiion denied.
   - [x] Initialize libevdev.
   - [x] Add failure case of initializing libevdev.
-- [ ] Finalize input device.
+- [x] Finalize input device.
 - [ ] Detect 'A' pressed.
-- [ ] Are multiple instance required ?
-- [ ] Move specific struct definition into private header.
+- [x] Multi-instantiation required.
+- [x] Move specific struct definition into private header.
+- [x] Check null pointer check.
 - [ ] evdev operation fails after cleanup().
 
 ## LED Brightness

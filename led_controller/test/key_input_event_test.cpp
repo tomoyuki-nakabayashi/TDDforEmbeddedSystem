@@ -120,4 +120,10 @@ TEST_F(KeyInputEventTest, CleanupKeyInputDevice) {
 
   EXPECT_FALSE(CleanupKeyInputDevice(dev_));
 }
+
+TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
+  const KeyInputDevice kNullPointer = NULL;
+  EXPECT_FALSE(InitKeyInputDevice(kNullPointer, kFilePath));
+  EXPECT_FALSE(CleanupKeyInputDevice(kNullPointer));
+}
 }  // namespace led_controller_test
