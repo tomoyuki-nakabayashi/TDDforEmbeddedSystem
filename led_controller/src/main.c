@@ -7,5 +7,8 @@
 int main(void) {
   KeyInputDevice dev = CreateKeyInputDevice();
   InitKeyInputDevice(dev, "/dev/input/event2");
+  CleanupKeyInputDevice(dev);
+  DestroyKeyInputDevice(dev);
+
   return 0;
 }

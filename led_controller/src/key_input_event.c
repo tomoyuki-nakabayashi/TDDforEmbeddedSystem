@@ -3,9 +3,7 @@
 
 #include <key_input_event_private.h>
 #include <fcntl.h>
-#include <assert.h>
 #include <errno.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <libevdev/libevdev.h>
 #include <os/io.h>
@@ -17,13 +15,6 @@ KeyInputDevice CreateKeyInputDevice() {
   dev->evdev = NULL;
 
   return dev;
-}
-
-void DestroyKeyInputDevice(KeyInputDevice dev) {
-  if(dev == NULL) return;
-
-  free(dev);
-  dev = NULL;
 }
 
 bool InitKeyInputDevice(KeyInputDevice dev, const char *device_file) {
@@ -50,4 +41,11 @@ bool CleanupKeyInputDevice(KeyInputDevice dev) {
   if (rc < 0) return false;
 
   return true;
+}
+
+void DestroyKeyInputDevice(KeyInputDevice dev) {
+  if(dev == NULL) return;
+
+  free(dev);
+  dev = NULL;
 }
