@@ -116,7 +116,7 @@ TEST_F(KeyInputEventTest, CanCleanupKeyInputDevice) {
 }
 
 TEST_F(KeyInputEventTest, CleanupKeyInputDeviceFailed) {
-  EXPECT_CALL(*mock_io, IO_CLOSE(-1)).WillRepeatedly(Return(-1));
+  EXPECT_CALL(*mock_io, IO_CLOSE(-1)).WillOnce(Return(-1));
 
   EXPECT_FALSE(CleanupKeyInputDevice(dev_));
 }
