@@ -126,4 +126,11 @@ TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
   EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice(kNullPointer, kFilePath));
   EXPECT_EQ(INPUT_DEV_CLEANUP_ERROR, CleanupKeyInputDevice(kNullPointer));
 }
+
+TEST_F(KeyInputEventTest, SetDetectCondition) {
+  struct timeval dummy {};
+  input_event ev {dummy, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
+  EXPECT_EQ(INPUT_DEV_SUCCESS, SetKeyInputDetectCondition(dev_, &ev));
+  EXPECT_TRUE(KeyInputDetected(dev_));
+}
 }  // namespace led_controller_test

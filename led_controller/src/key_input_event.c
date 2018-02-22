@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 #include <libevdev/libevdev.h>
 #include <os/io.h>
 #include <utils/logger.h>
@@ -12,6 +13,7 @@
 typedef struct KeyInputDeviceStruct {
   int fd;
   struct libevdev *evdev;
+  struct input_event target_event;
 } KeyInputDeviceStruct;
 
 KeyInputDevice CreateKeyInputDevice() {
@@ -36,6 +38,15 @@ int InitKeyInputDevice(KeyInputDevice dev, const char *device_file) {
   if (rc < 0) return INPUT_DEV_INIT_ERROR;
 
   return INPUT_DEV_SUCCESS;
+}
+
+int SetKeyInputDetectCondition(KeyInputDevice dev, struct input_event *ev) {
+  memcpy(&dev->target_event, ev, sizeof(struct input_event));
+  return INPUT_DEV_SUCCESS;
+}
+
+bool KeyInputDetected(KeyInputDevice dev) {
+  return true;
 }
 
 int CleanupKeyInputDevice(KeyInputDevice dev) {

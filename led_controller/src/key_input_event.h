@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <linux/input.h>
 
 enum {
   INPUT_DEV_SUCCESS = 0,
@@ -16,11 +17,18 @@ enum {
   INPUT_DEV_CLEANUP_ERROR = -2,
 };
 
+enum {
+  INPUT_KEY_RELEASED = 0,
+  INPUT_KEY_PRESSED = 1,
+};
+
 struct KeyInputDeviceStruct;
 typedef struct KeyInputDeviceStruct *KeyInputDevice;
 
 KeyInputDevice CreateKeyInputDevice();
 int InitKeyInputDevice(KeyInputDevice dev, const char *device_file);
+int SetKeyInputDetectCondition(KeyInputDevice dev, struct input_event *ev);
+bool KeyInputDetected(KeyInputDevice dev);
 int CleanupKeyInputDevice(KeyInputDevice dev);
 void DestroyKeyInputDevice(KeyInputDevice dev);
 
