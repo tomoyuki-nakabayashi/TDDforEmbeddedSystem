@@ -128,9 +128,11 @@ TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
 }
 
 TEST_F(KeyInputEventTest, SetDetectCondition) {
+  EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _))
+    .WillOnce(Return(LIBEVDEV_READ_STATUS_SUCCESS));
   struct timeval dummy {};
-  input_event ev {dummy, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
-  EXPECT_EQ(INPUT_DEV_SUCCESS, SetKeyInputDetectCondition(dev_, &ev));
+  input_event target {dummy, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
+  EXPECT_EQ(INPUT_DEV_SUCCESS, SetKeyInputDetectCondition(dev_, &target));
   EXPECT_TRUE(KeyInputDetected(dev_));
 }
 }  // namespace led_controller_test

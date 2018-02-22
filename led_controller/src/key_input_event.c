@@ -45,8 +45,19 @@ int SetKeyInputDetectCondition(KeyInputDevice dev, struct input_event *ev) {
   return INPUT_DEV_SUCCESS;
 }
 
+static bool IsTargetEvent(struct input_event *target, struct input_event ev) {
+  return target->type == ev->type
+      && target->code == ev->code
+      && target->value == ev->value;
+}
+
 bool KeyInputDetected(KeyInputDevice dev) {
-  return true;
+  struct input_event ev;
+  if (libevdev_next_event(dev->evdev, LIBEVDEV_READ_FLAG_NORMAL, &ev)
+      == LIBEVDEV_READ_STATUS_SUCCESS) {
+    return IsTargetEvent(dev->target_event, &ev);
+  }
+  return false;
 }
 
 int CleanupKeyInputDevice(KeyInputDevice dev) {
