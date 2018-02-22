@@ -10,15 +10,19 @@ extern "C" {
 
 #include <stdbool.h>
 
+enum {
+  INPUT_DEV_SUCCESS = 0,
+  INPUT_DEV_INIT_ERROR = -1,
+  INPUT_DEV_CLEANUP_ERROR = -2,
+};
+
 struct KeyInputDeviceStruct;
 typedef struct KeyInputDeviceStruct *KeyInputDevice;
 
 KeyInputDevice CreateKeyInputDevice();
-bool InitKeyInputDevice(KeyInputDevice dev, const char *device_file);
-bool CleanupKeyInputDevice(KeyInputDevice dev);
+int InitKeyInputDevice(KeyInputDevice dev, const char *device_file);
+int CleanupKeyInputDevice(KeyInputDevice dev);
 void DestroyKeyInputDevice(KeyInputDevice dev);
-
-#include "key_input_event_private.h"
 
 #ifdef __cplusplus
 }

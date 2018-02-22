@@ -57,13 +57,13 @@ static constexpr char kFilePath[]  {"/dev/input/event2"};
 
 TEST_F(KeyInputEventTest, CanInitInputDevice) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
-  EXPECT_TRUE(InitKeyInputDevice(dev_, kFilePath));
+  EXPECT_EQ(INPUT_DEV_SUCCESS, InitKeyInputDevice(dev_, kFilePath));
 }
 
 TEST_F(KeyInputEventTest, FailToInitInputDevice) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
     Invoke([](const char*, int) { errno = ENOENT; return -1; }));
-  EXPECT_FALSE(InitKeyInputDevice(dev_, "./file_not_found"));
+  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice(dev_, "./invalid"));
 }
 
 TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
@@ -73,7 +73,7 @@ TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
     Invoke([](const char*, int) { errno = EACCES; return -1; }));
 
-  EXPECT_FALSE(InitKeyInputDevice(dev_, kFilePath));
+  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice(dev_, kFilePath));
   EXPECT_STREQ("Fail to open file. You may need root permission.",
                spy.get());
 }
@@ -84,14 +84,14 @@ TEST_F(KeyInputEventTest, CanInitEvdev) {
     .WillOnce(Return(0));
 
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(kFileDescriptor));
-  EXPECT_TRUE(InitKeyInputDevice(dev_, kFilePath));
+  EXPECT_EQ(INPUT_DEV_SUCCESS, InitKeyInputDevice(dev_, kFilePath));
 }
 
 TEST_F(KeyInputEventTest, InitEvdevFailed) {
   EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(_, _))
     .WillOnce(Return(-EBADF));
 
-  EXPECT_FALSE(InitKeyInputDevice(dev_, kFilePath));
+  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice(dev_, kFilePath));
 }
 
 static void InitHelper(KeyInputDevice dev,
@@ -112,18 +112,18 @@ TEST_F(KeyInputEventTest, CanCleanupKeyInputDevice) {
   EXPECT_CALL(*mock_libevdev, libevdev_free(_)).Times(1);
   EXPECT_CALL(*mock_io, IO_CLOSE(kFd)).WillOnce(Return(0));
 
-  EXPECT_TRUE(CleanupKeyInputDevice(dev_));
+  EXPECT_EQ(INPUT_DEV_SUCCESS, CleanupKeyInputDevice(dev_));
 }
 
 TEST_F(KeyInputEventTest, CleanupKeyInputDeviceFailed) {
   EXPECT_CALL(*mock_io, IO_CLOSE(-1)).WillOnce(Return(-1));
 
-  EXPECT_FALSE(CleanupKeyInputDevice(dev_));
+  EXPECT_EQ(INPUT_DEV_CLEANUP_ERROR, CleanupKeyInputDevice(dev_));
 }
 
 TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
   const KeyInputDevice kNullPointer = NULL;
-  EXPECT_FALSE(InitKeyInputDevice(kNullPointer, kFilePath));
-  EXPECT_FALSE(CleanupKeyInputDevice(kNullPointer));
+  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice(kNullPointer, kFilePath));
+  EXPECT_EQ(INPUT_DEV_CLEANUP_ERROR, CleanupKeyInputDevice(kNullPointer));
 }
 }  // namespace led_controller_test
