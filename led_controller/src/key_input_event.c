@@ -1,13 +1,18 @@
 // Copyright <2018> <Tomoyuki Nakabayashi>
 // This software is released under the MIT License, see LICENSE.
 
-#include <key_input_event_private.h>
+#include <key_input_event.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <libevdev/libevdev.h>
 #include <os/io.h>
 #include <utils/logger.h>
+
+typedef struct KeyInputDeviceStruct {
+  int fd;
+  struct libevdev *evdev;
+} KeyInputDeviceStruct;
 
 KeyInputDevice CreateKeyInputDevice() {
   KeyInputDevice dev = calloc(1, sizeof(KeyInputDeviceStruct));

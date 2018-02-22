@@ -2,7 +2,7 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <gtest/gtest.h>
-#include <key_input_event_private.h>
+#include <key_input_event.h>
 #include <fstream>
 #include <memory>
 #include <os/mock_io.h>
