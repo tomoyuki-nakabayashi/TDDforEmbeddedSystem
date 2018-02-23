@@ -13,7 +13,7 @@ class MOCK_LIBEVDEV {
     MOCK_METHOD2(libevdev_new_from_fd, int(int, libevdev**));
     MOCK_METHOD1(libevdev_free, void(libevdev*));
     MOCK_METHOD3(libevdev_next_event,
-                 int(libevdev*, unsinged int, input_event*));
+                 int(libevdev*, unsigned int, input_event*));
 };
 
 extern MOCK_LIBEVDEV *mock_libevdev;
@@ -27,7 +27,7 @@ extern "C" {
     return mock_libevdev->libevdev_free(dev);
   }
 
-  int libevdev_next_event(libevdev* dev, unsinged int flags, input_event* ev) {
+  int libevdev_next_event(libevdev* dev, unsigned int flags, input_event* ev) {
     return mock_libevdev->libevdev_next_event(dev, flags, ev);
   }
 }

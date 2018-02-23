@@ -18,6 +18,7 @@ using ::testing::Return;
 using ::testing::_;
 using ::testing::DoAll;
 using ::testing::Invoke;
+using ::testing::SetArgPointee;
 
 class KeyInputEventTest : public ::testing::Test {
  protected:
@@ -127,11 +128,13 @@ TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
   EXPECT_EQ(INPUT_DEV_CLEANUP_ERROR, CleanupKeyInputDevice(kNullPointer));
 }
 
-TEST_F(KeyInputEventTest, SetDetectCondition) {
+TEST_F(KeyInputEventTest, DetectCondition) {
+  input_event target {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
+  auto action = [target](libevdev*, unsigned int, input_event* ev) {
+      *ev = target; return LIBEVDEV_READ_STATUS_SUCCESS; };
   EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _))
-    .WillOnce(Return(LIBEVDEV_READ_STATUS_SUCCESS));
-  struct timeval dummy {};
-  input_event target {dummy, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
+    .WillOnce(Invoke(action));
+
   EXPECT_EQ(INPUT_DEV_SUCCESS, SetKeyInputDetectCondition(dev_, &target));
   EXPECT_TRUE(KeyInputDetected(dev_));
 }
