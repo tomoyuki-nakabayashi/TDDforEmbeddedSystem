@@ -138,4 +138,13 @@ TEST_F(KeyInputEventTest, DetectCondition) {
   EXPECT_EQ(INPUT_DEV_SUCCESS, SetKeyInputDetectCondition(dev_, &target));
   EXPECT_TRUE(KeyInputDetected(dev_));
 }
+
+TEST_F(KeyInputEventTest, CannotDetectEvent) {
+  input_event target {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
+  EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _))
+    .WillOnce(Return(-EAGAIN));
+
+  EXPECT_EQ(INPUT_DEV_SUCCESS, SetKeyInputDetectCondition(dev_, &target));
+  EXPECT_FALSE(KeyInputDetected(dev_));
+}
 }  // namespace led_controller_test
