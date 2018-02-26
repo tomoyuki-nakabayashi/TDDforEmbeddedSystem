@@ -27,7 +27,8 @@ typedef struct KeyInputDeviceStruct *KeyInputDevice;
 
 KeyInputDevice CreateKeyInputDevice();
 int InitKeyInputDevice(KeyInputDevice dev, const char *device_file);
-int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev);
+void SetKeyInputDetectCondition(KeyInputDevice dev,
+                                const struct input_event *ev);
 bool KeyInputDetected(KeyInputDevice dev);
 int CleanupKeyInputDevice(KeyInputDevice dev);
 void DestroyKeyInputDevice(KeyInputDevice dev);
