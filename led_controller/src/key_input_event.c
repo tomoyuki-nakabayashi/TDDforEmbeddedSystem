@@ -40,7 +40,7 @@ int InitKeyInputDevice(KeyInputDevice dev, const char *device_file) {
   return INPUT_DEV_SUCCESS;
 }
 
-int SetKeyInputDetectCondition(KeyInputDevice dev, struct input_event *ev) {
+int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev) {
   memcpy(&dev->target_event, ev, sizeof(struct input_event));
   return INPUT_DEV_SUCCESS;
 }

@@ -128,23 +128,29 @@ TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
   EXPECT_EQ(INPUT_DEV_CLEANUP_ERROR, CleanupKeyInputDevice(kNullPointer));
 }
 
+static constexpr input_event kTarget {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
+
 TEST_F(KeyInputEventTest, DetectCondition) {
-  input_event target {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
-  auto action = [target](libevdev*, unsigned int, input_event* ev) {
-      *ev = target; return LIBEVDEV_READ_STATUS_SUCCESS; };
+  auto action = [kTarget](libevdev*, unsigned int, input_event* ev) {
+      *ev = kTarget; return LIBEVDEV_READ_STATUS_SUCCESS; };
   EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _))
     .WillOnce(Invoke(action));
 
-  EXPECT_EQ(INPUT_DEV_SUCCESS, SetKeyInputDetectCondition(dev_, &target));
+  EXPECT_EQ(INPUT_DEV_SUCCESS, SetKeyInputDetectCondition(dev_, &kTarget));
   EXPECT_TRUE(KeyInputDetected(dev_));
 }
 
 TEST_F(KeyInputEventTest, CannotDetectEvent) {
-  input_event target {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
   EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _))
     .WillOnce(Return(-EAGAIN));
 
-  EXPECT_EQ(INPUT_DEV_SUCCESS, SetKeyInputDetectCondition(dev_, &target));
+  EXPECT_EQ(INPUT_DEV_SUCCESS, SetKeyInputDetectCondition(dev_, &kTarget));
   EXPECT_FALSE(KeyInputDetected(dev_));
 }
+/* 
+TEST_F(KeyInputEventTest, DetectOnlyInterestedEvent) {
+  input_event target {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
+  EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _))
+    .WillOnce(Return(-EAGAIN));
+} */
 }  // namespace led_controller_test
