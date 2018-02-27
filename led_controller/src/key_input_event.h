@@ -12,10 +12,12 @@ extern "C" {
 #include <linux/input.h>
 
 enum {
+  INPUT_DEV_EVENT_DETECTED = 1,
   INPUT_DEV_SUCCESS = 0,
   INPUT_DEV_INIT_ERROR = -1,
   INPUT_DEV_CLEANUP_ERROR = -2,
   INPUT_DEV_INVALID_DEV = -3,    // Given KeyInputDevice is null.
+  INPUT_DEV_NO_EVENT = -4,
 };
 
 enum {
@@ -40,7 +42,7 @@ int InitKeyInputDevice(KeyInputDevice dev, const char *device_file);
 int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev);
 
 
-bool KeyInputDetected(KeyInputDevice dev);
+int CheckKeyInput(KeyInputDevice dev);
 int CleanupKeyInputDevice(KeyInputDevice dev);
 void DestroyKeyInputDevice(KeyInputDevice dev);
 

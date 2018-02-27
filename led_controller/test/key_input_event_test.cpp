@@ -129,7 +129,7 @@ TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
   EXPECT_EQ(INPUT_DEV_INVALID_DEV, InitKeyInputDevice(kNullPointer, kFilePath));
   EXPECT_EQ(INPUT_DEV_INVALID_DEV, CleanupKeyInputDevice(kNullPointer));
   EXPECT_EQ(INPUT_DEV_INVALID_DEV, SetKeyInputDetectCondition(kNullPointer, &kPressA));
-  EXPECT_EQ(INPUT_DEV_INVALID_DEV, KeyInputDetected(kNullPointer));
+  EXPECT_EQ(INPUT_DEV_INVALID_DEV, CheckKeyInput(kNullPointer));
 }
 
 TEST_F(KeyInputEventTest, DetectCondition) {
@@ -137,7 +137,7 @@ TEST_F(KeyInputEventTest, DetectCondition) {
     DoAll(SetArgPointee<2>(kPressA), Return(LIBEVDEV_READ_STATUS_SUCCESS)));
 
   SetKeyInputDetectCondition(dev_, &kPressA);
-  EXPECT_TRUE(KeyInputDetected(dev_));
+  EXPECT_EQ(INPUT_DEV_EVENT_DETECTED, CheckKeyInput(dev_));
 }
 
 TEST_F(KeyInputEventTest, CannotDetectEvent) {
@@ -145,7 +145,7 @@ TEST_F(KeyInputEventTest, CannotDetectEvent) {
     .WillOnce(Return(-EAGAIN));
 
   SetKeyInputDetectCondition(dev_, &kPressA);
-  EXPECT_FALSE(KeyInputDetected(dev_));
+  EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
 }
 
 TEST_F(KeyInputEventTest, DetectOnlyInterestedEvent) {
@@ -159,9 +159,9 @@ TEST_F(KeyInputEventTest, DetectOnlyInterestedEvent) {
     .WillOnce(DoAll(SetArgPointee<2>(kPressA), Return(kSuccess)));
 
   SetKeyInputDetectCondition(dev_, &kPressA);
-  EXPECT_FALSE(KeyInputDetected(dev_));
-  EXPECT_FALSE(KeyInputDetected(dev_));
-  EXPECT_FALSE(KeyInputDetected(dev_));
-  EXPECT_TRUE(KeyInputDetected(dev_));
+  EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
+  EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
+  EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
+  EXPECT_EQ(INPUT_DEV_EVENT_DETECTED, CheckKeyInput(dev_));
 }
 }  // namespace led_controller_test
