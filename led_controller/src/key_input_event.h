@@ -15,6 +15,7 @@ enum {
   INPUT_DEV_SUCCESS = 0,
   INPUT_DEV_INIT_ERROR = -1,
   INPUT_DEV_CLEANUP_ERROR = -2,
+  INPUT_DEV_INVALID_DEV = -3,    // Given KeyInputDevice is null.
 };
 
 enum {
@@ -26,8 +27,19 @@ struct KeyInputDeviceStruct;
 typedef struct KeyInputDeviceStruct *KeyInputDevice;
 
 KeyInputDevice CreateKeyInputDevice();
+
+// params: dev  You must create this by CreateKeyInputDevice()
+//              before you use this function.
+// return: INPUT_DEV_SUCCESS if successfully initialize input device's handler.
+//         INPUT_DEV_INVALID_DEV if given device has null pointer.
+//         otherwise, INPUT_DEV_INIT_ERROR
 int InitKeyInputDevice(KeyInputDevice dev, const char *device_file);
+
+// params: dev  You must initialize this by InitKeyInputDevice() before use.
+//         ev   Your interested event. time member will be ignored.
 int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev);
+
+
 bool KeyInputDetected(KeyInputDevice dev);
 int CleanupKeyInputDevice(KeyInputDevice dev);
 void DestroyKeyInputDevice(KeyInputDevice dev);
