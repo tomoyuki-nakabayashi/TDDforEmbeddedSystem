@@ -122,13 +122,15 @@ TEST_F(KeyInputEventTest, CleanupKeyInputDeviceFailed) {
   EXPECT_EQ(INPUT_DEV_CLEANUP_ERROR, CleanupKeyInputDevice(dev_));
 }
 
+static constexpr input_event kPressA {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
+
 TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
   const KeyInputDevice kNullPointer = NULL;
-  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice(kNullPointer, kFilePath));
-  EXPECT_EQ(INPUT_DEV_CLEANUP_ERROR, CleanupKeyInputDevice(kNullPointer));
+  EXPECT_EQ(INPUT_DEV_INVALID_DEV, InitKeyInputDevice(kNullPointer, kFilePath));
+  EXPECT_EQ(INPUT_DEV_INVALID_DEV, CleanupKeyInputDevice(kNullPointer));
+  EXPECT_EQ(INPUT_DEV_INVALID_DEV, SetKeyInputDetectCondition(kNullPointer, &kPressA));
+  EXPECT_EQ(INPUT_DEV_INVALID_DEV, KeyInputDetected(kNullPointer));
 }
-
-static constexpr input_event kPressA {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
 
 TEST_F(KeyInputEventTest, DetectCondition) {
   auto action_press_a = [kPressA](libevdev*, unsigned int, input_event* ev) {

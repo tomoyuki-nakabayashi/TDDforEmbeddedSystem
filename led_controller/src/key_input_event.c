@@ -25,7 +25,7 @@ KeyInputDevice CreateKeyInputDevice() {
 }
 
 int InitKeyInputDevice(KeyInputDevice dev, const char *device_file) {
-  if(dev == NULL) return INPUT_DEV_INIT_ERROR;
+  if(dev == NULL) return INPUT_DEV_INVALID_DEV;
 
   dev->fd = IO_OPEN(device_file, O_RDONLY|O_NONBLOCK);
   if (dev->fd < 0) {
@@ -41,6 +41,8 @@ int InitKeyInputDevice(KeyInputDevice dev, const char *device_file) {
 }
 
 int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev) {
+  if (dev == NULL) return INPUT_DEV_INVALID_DEV;
+  // Should I validate ev, here?
   memcpy(&dev->target_event, ev, sizeof(struct input_event));
   return INPUT_DEV_SUCCESS;
 }
@@ -52,6 +54,7 @@ static bool IsTargetEvent(struct input_event *target, struct input_event *ev) {
 }
 
 bool KeyInputDetected(KeyInputDevice dev) {
+  if (dev == NULL) return INPUT_DEV_INVALID_DEV;
   struct input_event ev;
   if (libevdev_next_event(dev->evdev, LIBEVDEV_READ_FLAG_NORMAL, &ev)
       == LIBEVDEV_READ_STATUS_SUCCESS) {
@@ -61,7 +64,7 @@ bool KeyInputDetected(KeyInputDevice dev) {
 }
 
 int CleanupKeyInputDevice(KeyInputDevice dev) {
-  if(dev == NULL) return INPUT_DEV_CLEANUP_ERROR;
+  if(dev == NULL) return INPUT_DEV_INVALID_DEV;
 
   libevdev_free(dev->evdev);
   int rc = IO_CLOSE(dev->fd);
