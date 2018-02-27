@@ -59,7 +59,7 @@ static bool IsTargetEvent(const struct input_event *target,
 }
 
 int CheckKeyInput(KeyInputDevice dev) {
-  if (dev == NULL) return INPUT_DEV_INVALID_DEV;
+  if (dev == NULL || dev->evdev == NULL) return INPUT_DEV_INVALID_DEV;
   struct input_event ev = {};
   if (HasPendingEvent(dev->evdev, &ev) && IsTargetEvent(&dev->target_event, &ev)) {
     return INPUT_DEV_EVENT_DETECTED;
@@ -71,6 +71,7 @@ int CleanupKeyInputDevice(KeyInputDevice dev) {
   if(dev == NULL) return INPUT_DEV_INVALID_DEV;
 
   libevdev_free(dev->evdev);
+  dev->evdev = NULL;
   int rc = IO_CLOSE(dev->fd);
   if (rc < 0) return INPUT_DEV_CLEANUP_ERROR;
 

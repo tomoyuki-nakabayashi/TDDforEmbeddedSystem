@@ -132,7 +132,35 @@ TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
   EXPECT_EQ(INPUT_DEV_INVALID_DEV, CheckKeyInput(kNullPointer));
 }
 
-TEST_F(KeyInputEventTest, DetectCondition) {
+class KeyInputEventDetectionTest : public ::testing::Test {
+ protected:
+    virtual void SetUp()
+    {
+      mock_io = new MOCK_IO {};
+      mock_libevdev = new MOCK_LIBEVDEV {};
+      dev_ = CreateKeyInputDevice();
+      EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(_, _)).WillOnce(
+        Invoke([](int, libevdev **dev) { *dev = reinterpret_cast<libevdev*>(new int{}); return 0;} )
+      ).RetiresOnSaturation();
+      InitKeyInputDevice(dev_, "dummy");
+    }
+
+    virtual void TearDown()
+    {
+      EXPECT_CALL(*mock_libevdev, libevdev_free(_)).WillOnce(
+        Invoke([](libevdev *dev) { free(dev); } )
+      ).RetiresOnSaturation();
+      CleanupKeyInputDevice(dev_);
+      DestroyKeyInputDevice(dev_);
+      delete mock_libevdev;
+      delete mock_io;
+    }
+
+ protected:
+    KeyInputDevice dev_;
+};
+
+TEST_F(KeyInputEventDetectionTest, DetectTargetEvent) {
   EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _)).WillOnce(
     DoAll(SetArgPointee<2>(kPressA), Return(LIBEVDEV_READ_STATUS_SUCCESS)));
 
@@ -140,7 +168,7 @@ TEST_F(KeyInputEventTest, DetectCondition) {
   EXPECT_EQ(INPUT_DEV_EVENT_DETECTED, CheckKeyInput(dev_));
 }
 
-TEST_F(KeyInputEventTest, CannotDetectEvent) {
+TEST_F(KeyInputEventDetectionTest, CannotDetectEvent) {
   EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _))
     .WillOnce(Return(-EAGAIN));
 
@@ -148,7 +176,7 @@ TEST_F(KeyInputEventTest, CannotDetectEvent) {
   EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
 }
 
-TEST_F(KeyInputEventTest, DetectOnlyInterestedEvent) {
+TEST_F(KeyInputEventDetectionTest, DetectOnlyInterestedEvent) {
   constexpr input_event kPressB {timeval{}, EV_KEY, KEY_B, INPUT_KEY_PRESSED};
   constexpr input_event kReleaseA {timeval{}, EV_KEY, KEY_A, INPUT_KEY_RELEASED};
   constexpr auto kSuccess = LIBEVDEV_READ_STATUS_SUCCESS;
@@ -163,5 +191,17 @@ TEST_F(KeyInputEventTest, DetectOnlyInterestedEvent) {
   EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
   EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
   EXPECT_EQ(INPUT_DEV_EVENT_DETECTED, CheckKeyInput(dev_));
+}
+
+TEST_F(KeyInputEventDetectionTest, FailOperationAfterCleanup) {
+  auto dev = CreateKeyInputDevice();
+
+  EXPECT_CALL(*mock_libevdev, libevdev_free(_)).WillOnce(
+    Invoke([](libevdev *dev) { free(dev); }));
+
+  CleanupKeyInputDevice(dev);
+  EXPECT_EQ(INPUT_DEV_INVALID_DEV, CheckKeyInput(dev));
+
+  DestroyKeyInputDevice(dev);
 }
 }  // namespace led_controller_test
