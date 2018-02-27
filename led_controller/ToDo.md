@@ -15,7 +15,7 @@
   - [x] Initialize libevdev.
   - [x] Add failure case of initializing libevdev.
 - [x] Finalize input device.
-- [ ] Detect 'A' pressed.
+- [x] Detect 'A' pressed.
 - [x] Multi-instantiation required.
 - [x] Move specific struct definition into private header.
 - [x] Check null pointer check.

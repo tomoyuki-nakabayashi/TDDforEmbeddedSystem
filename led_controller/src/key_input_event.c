@@ -44,10 +44,10 @@ int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev)
   if (dev == NULL) return INPUT_DEV_INVALID_DEV;
   // Should I validate ev, here?
   memcpy(&dev->target_event, ev, sizeof(struct input_event));
-  return INPUT_DEV_SUCCESS;
 }
 
-static bool IsTargetEvent(struct input_event *target, struct input_event *ev) {
+static bool IsTargetEvent(const struct input_event *target,
+                          const struct input_event *ev) {
   return target->type == ev->type
       && target->code == ev->code
       && target->value == ev->value;
