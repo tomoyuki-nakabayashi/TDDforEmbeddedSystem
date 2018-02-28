@@ -19,7 +19,7 @@
 - [x] Multi-instantiation required.
 - [x] Move specific struct definition into private header.
 - [x] Check null pointer check.
-- [ ] evdev operation fails after cleanup().
+- [x] evdev operation fails after cleanup().
 
 ## LED Brightness
 

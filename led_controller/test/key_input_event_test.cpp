@@ -140,17 +140,14 @@ class KeyInputEventDetectionTest : public ::testing::Test {
       mock_libevdev = new MOCK_LIBEVDEV {};
       dev_ = CreateKeyInputDevice();
       EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(_, _)).WillOnce(
-        Invoke([](int, libevdev **dev) { *dev = reinterpret_cast<libevdev*>(new int{}); return 0;} )
+        Invoke([](int, libevdev **dev) { *dev = reinterpret_cast<libevdev*>(0x12345678); return 0;} )
       ).RetiresOnSaturation();
+      EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
       InitKeyInputDevice(dev_, "dummy");
     }
 
     virtual void TearDown()
     {
-      EXPECT_CALL(*mock_libevdev, libevdev_free(_)).WillOnce(
-        Invoke([](libevdev *dev) { free(dev); } )
-      ).RetiresOnSaturation();
-      CleanupKeyInputDevice(dev_);
       DestroyKeyInputDevice(dev_);
       delete mock_libevdev;
       delete mock_io;
@@ -194,11 +191,9 @@ TEST_F(KeyInputEventDetectionTest, DetectOnlyInterestedEvent) {
 }
 
 TEST_F(KeyInputEventDetectionTest, FailOperationAfterCleanup) {
+  EXPECT_CALL(*mock_libevdev, libevdev_free(_)).Times(1);
+
   auto dev = CreateKeyInputDevice();
-
-  EXPECT_CALL(*mock_libevdev, libevdev_free(_)).WillOnce(
-    Invoke([](libevdev *dev) { free(dev); }));
-
   CleanupKeyInputDevice(dev);
   EXPECT_EQ(INPUT_DEV_INVALID_DEV, CheckKeyInput(dev));
 
