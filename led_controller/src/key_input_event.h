@@ -28,22 +28,39 @@ enum {
 struct KeyInputDeviceStruct;
 typedef struct KeyInputDeviceStruct *KeyInputDevice;
 
+// Create an instance.
 KeyInputDevice CreateKeyInputDevice();
 
-// params: dev  You must create this by CreateKeyInputDevice()
-//              before you use this function.
+// Initialize key input device.
+// params: dev  Must create an instance by CreateKeyInputDevice() before use.
 // return: INPUT_DEV_SUCCESS if successfully initialize input device's handler.
-//         INPUT_DEV_INVALID_DEV if given device has null pointer.
-//         otherwise, INPUT_DEV_INIT_ERROR
+//         INPUT_DEV_INVALID_DEV if dev is not initialized.
+//         Otherwise, INPUT_DEV_INIT_ERROR
 int InitKeyInputDevice(KeyInputDevice dev, const char *device_file);
 
-// params: dev  You must initialize this by InitKeyInputDevice() before use.
-//         ev   Your interested event. time member will be ignored.
+// Set a condition you want to detect.
+// params: dev  Must initialize an instance by InitKeyInputDevice() before use.
+//         ev   Target event. time member will be ignored.
+// return: INPUT_DEV_SUCCESS if dev has already been initialized.
+//         Otherwire, INPUT_DEV_INVALID_DEV
 int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev);
 
-
+// Check key input you have set by SetKeyInputDetectCondition().
+// params: dev  Must initialize an instance by InitKeyInputDevice() before use.
+// return: INPUT_DEV_EVENT_DETECTED if target event detected.
+//         INPUT_DEV_INVALID_DEV if dev is not initialized.
+//         Otherwise, INPUT_DEV_NO_EVENT
 int CheckKeyInput(KeyInputDevice dev);
+
+// Cleanup key input device. Should call this function before destroy.
+// Should not use the device after this function called.
+// params: dev  Must initialize an instance by InitKeyInputDevice() before use.
+// return: INPUT_DEV_SUCCESS if no error occurs.
+//         INPUT_DEV_INVALID_DEV if dev is not initialized.
+//         Otherwise, INPUT_DEV_CLEANUP_ERROR
 int CleanupKeyInputDevice(KeyInputDevice dev);
+
+// Destroy the instance.
 void DestroyKeyInputDevice(KeyInputDevice dev);
 
 #ifdef __cplusplus

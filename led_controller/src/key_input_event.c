@@ -44,6 +44,7 @@ int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev)
   if (dev == NULL) return INPUT_DEV_INVALID_DEV;
   // Should I validate ev, here?
   memcpy(&dev->target_event, ev, sizeof(struct input_event));
+  return INPUT_DEV_SUCCESS;
 }
 
 static bool HasPendingEvent(struct libevdev *evdev, struct input_event *ev) {
