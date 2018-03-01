@@ -16,13 +16,8 @@ class MOCK_IO {
 extern MOCK_IO *mock_io;
 
 extern "C" {
-  int IO_OPEN(const char* pathname, int flags) {
-    return mock_io->IO_OPEN(pathname, flags);
-  }
-
-  int IO_CLOSE(int fd) {
-    return mock_io->IO_CLOSE(fd);
-  }
+  int IO_OPEN(const char* pathname, int flags);
+  int IO_CLOSE(int fd);
 }
 
 #endif  // MOCK_LED_CONTROLLER_OS_IO_H_

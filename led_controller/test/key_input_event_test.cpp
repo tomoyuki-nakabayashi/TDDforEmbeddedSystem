@@ -10,7 +10,7 @@
 #include <libs/mock_libevdev.h>
 #include <errno.h>
 
-MOCK_IO *mock_io {};
+// Definition of mock_io is in mock_io.cpp
 MOCK_LIBEVDEV *mock_libevdev {};
 
 namespace led_controller_test {
@@ -203,5 +203,13 @@ TEST_F(KeyInputEventDetectionTest, FailOperationAfterCleanup) {
   EXPECT_EQ(INPUT_DEV_INVALID_DEV, CheckKeyInput(dev));
 
   DestroyKeyInputDevice(dev);
+}
+
+TEST_F(KeyInputEventDetectionTest, TestFree) {
+  int *mem = static_cast<int*>(calloc(1, sizeof(int)));
+  int *tmp = mem;
+
+  free(mem);
+  EXPECT_EQ(tmp, mem);
 }
 }  // namespace led_controller_test

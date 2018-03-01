@@ -10,6 +10,8 @@ add_executable(led_controller
 add_executable(unittests
     src/key_input_event.c
     test/key_input_event_test.cpp
+    test/led_driver_test.cpp
+    test/mocks/os/mock_io.cpp
     test/mocks/utils/logger_spy.c)
 
 target_link_libraries(led_controller ${LIBEVDEV_LIBRARIES})
