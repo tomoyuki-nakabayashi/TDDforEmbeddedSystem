@@ -9,6 +9,7 @@ add_executable(led_controller
 
 add_executable(unittests
     src/key_input_event.c
+    src/led_driver.c
     test/key_input_event_test.cpp
     test/led_driver_test.cpp
     test/mocks/os/mock_io.cpp
