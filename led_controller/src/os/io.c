@@ -9,6 +9,10 @@ int IO_OPEN(const char *pathname, int flags) {
   return open(pathname, flags);
 }
 
+ssize_t IO_WRITE(int fd, const void *buf, size_t count) {
+  return write(fd, buf, count);
+}
+
 int IO_CLOSE(int fd) {
   return close(fd);
 }

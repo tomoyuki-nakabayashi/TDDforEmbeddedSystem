@@ -8,7 +8,10 @@
 extern "C" {
 #endif
 
+#include <unistd.h>
+
 int IO_OPEN(const char *pathname, int flags);
+ssize_t IO_WRITE(int fd, const void *buf, size_t count);
 int IO_CLOSE(int fd);
 
 #ifdef __cplusplus
