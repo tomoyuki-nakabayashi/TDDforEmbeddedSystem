@@ -25,6 +25,8 @@ typedef enum {
 LedDriver CreateLedDriver();
 int InitLedDriver(LedDriver self, const char* device_file);
 void TurnOnLed(LedDriver self);
+void TurnOffLed(LedDriver self);
+void ToggleLed(LedDriver self);
 void DestroyLedDriver(LedDriver self);
 
 #ifdef __cplusplus

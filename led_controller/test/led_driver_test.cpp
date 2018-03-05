@@ -13,6 +13,7 @@ namespace led_controller_test {
 using ::testing::_;
 using ::testing::Return;
 using ::testing::StrEq;
+  using ::testing::InSequence;
 
 class LedDriverTest : public ::testing::Test {
  protected:
@@ -69,6 +70,33 @@ class LedDriverOnOffTest : public ::testing::Test {
 TEST_F(LedDriverOnOffTest, TurnOn) {
   EXPECT_CALL(*mock_io, IO_WRITE(kFd, StrEq("1\n"), 2)).Times(1);
   TurnOnLed(driver_);
+}
+
+TEST_F(LedDriverOnOffTest, TurnOff) {
+  EXPECT_CALL(*mock_io, IO_WRITE(kFd, StrEq("0\n"), 2)).Times(1);
+  TurnOffLed(driver_);
+}
+
+TEST_F(LedDriverOnOffTest, ToggleLed) {
+  InSequence s;
+  EXPECT_CALL(*mock_io, IO_WRITE(kFd, StrEq("0\n"), 2)).Times(1);
+  EXPECT_CALL(*mock_io, IO_WRITE(kFd, StrEq("1\n"), 2)).Times(1);
+  EXPECT_CALL(*mock_io, IO_WRITE(kFd, StrEq("0\n"), 2)).Times(1);
+
+  TurnOffLed(driver_);
+  ToggleLed(driver_);
+  ToggleLed(driver_);
+}
+
+TEST_F(LedDriverOnOffTest, FailToToggleUninitializedLed) {
+  EXPECT_CALL(*mock_io, IO_WRITE(_, _, _)).Times(0);
+  ToggleLed(driver_);
+}
+
+TEST_F(LedDriverOnOffTest, NullPointerGuard) {
+  EXPECT_CALL(*mock_io, IO_WRITE(_, _, _)).Times(0);
+  TurnOnLed(nullptr);
+  TurnOffLed(nullptr);
 }
 
 }  // namespace led_controller_test

@@ -32,7 +32,25 @@ int InitLedDriver(LedDriver self, const char* device_file) {
 }
 
 void TurnOnLed(LedDriver self) {
+  if (self == NULL) return;
+  self->status = LED_TURN_ON;
   IO_WRITE(self->fd, "1\n", 2);
+}
+
+void TurnOffLed(LedDriver self) {
+  if (self == NULL) return;
+  self->status = LED_TURN_OFF;
+  IO_WRITE(self->fd, "0\n", 2);
+}
+
+void ToggleLed(LedDriver self) {
+  if (self == NULL || self->status == LED_UNKNOWN) return;
+
+  if (self->status == LED_TURN_OFF) {
+    TurnOnLed(self);
+  } else {
+    TurnOffLed(self);
+  }
 }
 
 void DestroyLedDriver(LedDriver self) {
