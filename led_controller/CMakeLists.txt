@@ -4,6 +4,7 @@ include_directories(src test/mocks)
 add_executable(led_controller
     src/main.c
     src/key_input_event.c
+    src/led_driver.c
     src/utils/logger.c
     src/os/io.c)
 

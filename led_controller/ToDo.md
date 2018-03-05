@@ -23,8 +23,9 @@
 
 ## LED Brightness
 
-- [ ] Make abstract use.
-- [ ] Initialize LED device.
-- [ ] Finalize LED device.
-- [ ] Turn on if LED is off.
-- [ ] Turn off if LED is on.
+- [x] Make abstract use.
+- [x] Initialize LED device.
+- [x] Finalize LED device.
+- [x] Turn on if LED is off.
+- [x] Turn off if LED is on.
+- [x] Toggle LED.
