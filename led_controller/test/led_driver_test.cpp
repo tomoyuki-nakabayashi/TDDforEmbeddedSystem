@@ -97,6 +97,20 @@ TEST_F(LedDriverOnOffTest, NullPointerGuard) {
   EXPECT_CALL(*mock_io, IO_WRITE(_, _, _)).Times(0);
   TurnOnLed(nullptr);
   TurnOffLed(nullptr);
+  ToggleLed(nullptr);
+
+  EXPECT_CALL(*mock_io, IO_CLOSE(_)).Times(0);
+  CleanupLedDriver(nullptr);
+}
+
+TEST_F(LedDriverOnOffTest, CleanupLedDriver) {
+  EXPECT_CALL(*mock_io, IO_CLOSE(kFd)).Times(1);
+  EXPECT_EQ(LED_DRIVER_SUCCESS, CleanupLedDriver(driver_));
+}
+
+TEST_F(LedDriverOnOffTest, FailToCleanupLedDriver) {
+  EXPECT_CALL(*mock_io, IO_CLOSE(kFd)).WillOnce(Return(-1));
+  EXPECT_EQ(LED_DRIVER_CLEAUP_ERROR, CleanupLedDriver(driver_));
 }
 
 }  // namespace led_controller_test

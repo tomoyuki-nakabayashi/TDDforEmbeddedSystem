@@ -14,6 +14,7 @@ typedef struct LedDriverStruct *LedDriver;
 enum {
   LED_DRIVER_SUCCESS = 0,
   LED_DRIVER_INIT_ERROR = -1,
+  LED_DRIVER_CLEAUP_ERROR = -2,
 };
 
 typedef enum {
@@ -27,6 +28,7 @@ int InitLedDriver(LedDriver self, const char* device_file);
 void TurnOnLed(LedDriver self);
 void TurnOffLed(LedDriver self);
 void ToggleLed(LedDriver self);
+int CleanupLedDriver(LedDriver self);
 void DestroyLedDriver(LedDriver self);
 
 #ifdef __cplusplus

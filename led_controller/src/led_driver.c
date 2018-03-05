@@ -53,6 +53,16 @@ void ToggleLed(LedDriver self) {
   }
 }
 
+int CleanupLedDriver(LedDriver self) {
+  if (self == NULL) return LED_DRIVER_CLEAUP_ERROR;
+
+  int rc = IO_CLOSE(self->fd);
+  if (rc < 0) {
+    return LED_DRIVER_CLEAUP_ERROR;
+  }
+  return LED_DRIVER_SUCCESS;
+}
+
 void DestroyLedDriver(LedDriver self) {
   if (self == NULL) return;
 
