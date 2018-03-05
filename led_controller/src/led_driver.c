@@ -31,6 +31,10 @@ int InitLedDriver(LedDriver self, const char* device_file) {
   return LED_DRIVER_SUCCESS;
 }
 
+void TurnOnLed(LedDriver self) {
+  IO_WRITE(self->fd, "1\n", 2);
+}
+
 void DestroyLedDriver(LedDriver self) {
   if (self == NULL) return;
 

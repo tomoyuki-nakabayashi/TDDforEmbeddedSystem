@@ -9,7 +9,7 @@ int IO_OPEN(const char* pathname, int flags) {
   return mock_io->IO_OPEN(pathname, flags);
 }
 
-ssize_t IO_WRITE(int fd, const void *buf, size_t count) {
+ssize_t IO_WRITE(int fd, const char *buf, size_t count) {
   return mock_io->IO_WRITE(fd, buf, count);
 }
 
