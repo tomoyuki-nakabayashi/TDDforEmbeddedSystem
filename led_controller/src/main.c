@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <key_input_event.h>
 #include <led_driver.h>
+#include <utils/logger.h>
 
 #define KEYBOARD_DEVICE "/dev/input/event2"
 #define LED_DEVICE      "/sys/class/leds/input2::capslock/brightness"
@@ -13,7 +14,7 @@
 int main(void) {
   KeyInputDevice press_a = CreateKeyInputDevice();
   if (InitKeyInputDevice(press_a, KEYBOARD_DEVICE) != INPUT_DEV_SUCCESS) {
-    printf("Fail to init input device\n");
+    DEBUG_LOG("Fail to init input device\n");
     exit(1);
   }
   struct timeval time = {};
@@ -22,7 +23,7 @@ int main(void) {
 
   LedDriver caps_led = CreateLedDriver();
   if (InitLedDriver(caps_led, LED_DEVICE) != LED_DRIVER_SUCCESS) {
-    printf("Fail to init led device\n");
+    DEBUG_LOG("Fail to init led device\n");
     exit(1);
   }
   TurnOffLed(caps_led);
