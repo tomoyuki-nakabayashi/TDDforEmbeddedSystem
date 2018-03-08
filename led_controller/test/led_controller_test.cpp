@@ -14,7 +14,7 @@ class LedControllerTest : public ::testing::Test {
     {
     }
 };
-
+/* 
 TEST_F(LedControllerTest, AbstractUse) {
   InitKeyInputDevice("path to key input device.");
   InitLedDevice("path to led device.")
@@ -29,5 +29,22 @@ TEST_F(LedControllerTest, AbstractUse) {
   FinalizeKeyInputDevice();
   FinalizeLedDevice();
 }
+*/
 
+TEST_F(LedControllerTest, AbstractUse) {
+  auto engine = CreateLedControlEngine();
+  LedControlCommand toggle{press_a, toggle_led};
+  LedControlCommand finish{press_b, flush_engine};
+  SelfAddCommand repeat_toggle{engine, toggle};
+  SelfAddCommand repeat_finish{engine, finish};
+
+  AddCommandToEngine(engine, repeat_toggle);
+  AddCommandToEngine(engine, repeat_finish);
+
+  if (!IsEmpty(engine)) {
+    ExecuteCommand(engine);
+  }
+
+  DestroyLedControlEngine(engine);
+}
 }  // namespace led_controller_test
