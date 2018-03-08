@@ -13,6 +13,7 @@ add_executable(unittests
     src/led_driver.c
     test/key_input_event_test.cpp
     test/led_driver_test.cpp
+    test/command_test.cpp
     test/mocks/os/mock_io.cpp
     test/mocks/utils/logger_spy.c)
 
