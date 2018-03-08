@@ -33,8 +33,8 @@ TEST_F(LedControllerTest, AbstractUse) {
 
 TEST_F(LedControllerTest, AbstractUse) {
   auto engine = CreateLedControlEngine();
-  LedControlCommand toggle{press_a, toggle_led};
-  LedControlCommand finish{press_b, flush_engine};
+  DetectThenOperateCommand toggle{press_a, toggle_led};
+  DetectThenOperateCommand finish{press_b, flush_engine};
   SelfAddCommand repeat_toggle{engine, toggle};
   SelfAddCommand repeat_finish{engine, finish};
 

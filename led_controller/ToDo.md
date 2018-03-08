@@ -1,5 +1,9 @@
 # To Do List
 
+## Environment
+
+- [ ] Link glib to use variable length array.
+
 ## LED Controller
 
 - [x] Consider top-level absctract use.
@@ -20,6 +24,7 @@
 - [x] Move specific struct definition into private header.
 - [x] Check null pointer check.
 - [x] evdev operation fails after cleanup().
+- [ ] Extract Detect interface.
 
 ## LED Brightness
 
@@ -29,3 +34,8 @@
 - [x] Turn on if LED is off.
 - [x] Turn off if LED is on.
 - [x] Toggle LED.
+- [ ] Extract Operate interface.
+
+## Engine control command
+
+- [ ] Implement flush by overriding Operate interface.
