@@ -207,4 +207,18 @@ TEST_F(KeyInputEventDetectionTest, TestFree) {
   free(mem);
   EXPECT_EQ(tmp, mem);
 }
+
+class InputEventFactoryTest : public ::testing::Test {
+};
+
+TEST_F(InputEventFactoryTest, CreateInputEvent) {
+  input_event expect {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
+  EXPECT_EQ(expect, InputEventFactory(KEY_A));
+}
 }  // namespace led_controller_test
+
+bool operator==(const input_event& lhs, const input_event& rhs) {
+  return ((lhs.type == rhs.type)
+       && (lhs.code == rhs.code)
+       && (lhs.value == rhs.value));
+}

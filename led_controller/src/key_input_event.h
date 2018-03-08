@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <linux/input.h>
 
 enum {
@@ -62,6 +63,8 @@ int CleanupKeyInputDevice(KeyInputDevice dev);
 
 // Destroy the instance.
 void DestroyKeyInputDevice(KeyInputDevice dev);
+
+struct input_event InputEventFactory(uint16_t code);
 
 #ifdef __cplusplus
 }

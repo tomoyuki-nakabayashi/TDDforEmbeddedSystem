@@ -25,6 +25,7 @@
 - [x] Check null pointer check.
 - [x] evdev operation fails after cleanup().
 - [ ] Extract Detect interface.
+- [ ] input event factory.
 
 ## LED Brightness
 

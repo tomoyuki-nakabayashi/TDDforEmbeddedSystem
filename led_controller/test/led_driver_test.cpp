@@ -13,7 +13,7 @@ namespace led_controller_test {
 using ::testing::_;
 using ::testing::Return;
 using ::testing::StrEq;
-  using ::testing::InSequence;
+using ::testing::InSequence;
 
 class LedDriverTest : public ::testing::Test {
  protected:

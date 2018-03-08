@@ -44,6 +44,18 @@ struct libevdev *dev = NULL;
         snprintf(buf, 2, "%d", led_on ? 1 : 0);
         write(led_fd, buf, 2);
       }
+      else if (ev.type == EV_KEY && ev.code == KEY_B && ev.value == KEY_PRESSED) {
+        led_on = true;
+        write(led_fd, "1\n", 2);
+      }
+      else if (ev.type == EV_KEY && ev.code == KEY_C && ev.value == KEY_PRESSED) {
+        led_on = false;
+        write(led_fd, "0\n", 2);
+      }
+      else if (ev.type == EV_KEY && ev.code == KEY_D && ev.value == KEY_PRESSED) {
+        break;
+      }
+      // What should I add next...
     }
   } while (rc == 1 || rc == 0 || rc == -EAGAIN);
 
