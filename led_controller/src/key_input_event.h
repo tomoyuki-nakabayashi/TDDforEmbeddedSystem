@@ -64,8 +64,6 @@ int CleanupKeyInputDevice(KeyInputDevice dev);
 // Destroy the instance.
 void DestroyKeyInputDevice(KeyInputDevice dev);
 
-struct input_event InputEventFactory(uint16_t code);
-
 #ifdef __cplusplus
 }
 #endif

@@ -85,9 +85,3 @@ void DestroyKeyInputDevice(KeyInputDevice dev) {
   free(dev);
   dev = NULL;
 }
-
-struct input_event InputEventFactory(uint16_t code) {
-  struct timeval time = {};
-  struct input_event ev = {time, EV_KEY, code, INPUT_KEY_PRESSED};
-  return ev;
-}

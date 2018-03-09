@@ -208,6 +208,7 @@ TEST_F(KeyInputEventDetectionTest, TestFree) {
   EXPECT_EQ(tmp, mem);
 }
 
+
 class InputEventFactoryTest : public ::testing::Test {
 };
 
@@ -222,3 +223,25 @@ bool operator==(const input_event& lhs, const input_event& rhs) {
        && (lhs.code == rhs.code)
        && (lhs.value == rhs.value));
 }
+
+class KeyInputEventTest : public ::testing::Test {
+ protected:
+    virtual void SetUp()
+    {
+      dev_ = CreateKeyInputDevice();
+      mock_io = new MOCK_IO {};
+      mock_libevdev = new MOCK_LIBEVDEV {};
+      errno = 0;
+    }
+
+    virtual void TearDown()
+    {
+      errno = 0;
+      delete mock_libevdev;
+      delete mock_io;
+      DestroyKeyInputDevice(dev_);
+    }
+
+ protected:
+    KeyInputDevice dev_;
+};
