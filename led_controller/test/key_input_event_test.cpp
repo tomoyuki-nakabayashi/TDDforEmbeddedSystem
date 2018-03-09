@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <key_input_event.h>
+#include <event_detector.h>
 #include <fstream>
 #include <memory>
 #include <os/mock_io.h>
@@ -209,39 +210,33 @@ TEST_F(KeyInputEventDetectionTest, TestFree) {
 }
 
 
-class InputEventFactoryTest : public ::testing::Test {
+class EvenCountDetectorTest : public ::testing::Test {
 };
 
-TEST_F(InputEventFactoryTest, CreateInputEvent) {
-  input_event expect {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
-  EXPECT_EQ(expect, InputEventFactory(KEY_A));
+typedef struct EvenCountDetector {
+  EventDetectorStruct detector;
+  int32_t counter;
+} EvenCountDetector;
+
+static bool CheckAndIncrement(EventDetector super) {
+  auto self = reinterpret_cast<EvenCountDetector*>(super);
+  self->counter++;
+  return ((self->counter % 2) == 0);
 }
-}  // namespace led_controller_test
 
-bool operator==(const input_event& lhs, const input_event& rhs) {
-  return ((lhs.type == rhs.type)
-       && (lhs.code == rhs.code)
-       && (lhs.value == rhs.value));
-}
-
-class KeyInputEventTest : public ::testing::Test {
- protected:
-    virtual void SetUp()
-    {
-      dev_ = CreateKeyInputDevice();
-      mock_io = new MOCK_IO {};
-      mock_libevdev = new MOCK_LIBEVDEV {};
-      errno = 0;
-    }
-
-    virtual void TearDown()
-    {
-      errno = 0;
-      delete mock_libevdev;
-      delete mock_io;
-      DestroyKeyInputDevice(dev_);
-    }
-
- protected:
-    KeyInputDevice dev_;
+static EventDetectorInterfaceStruct interface = {
+  CheckAndIncrement
 };
+
+TEST_F(EvenCountDetectorTest, EvenCountDetector) {
+  EvenCountDetector even_detector{};
+  even_detector.detector.vtable = &interface;
+
+  auto ret = CommandExecute(reinterpret_cast<EventDetector>(&even_detector));
+  EXPECT_FALSE(ret);
+
+  ret = CommandExecute(reinterpret_cast<EventDetector>(&even_detector));
+  EXPECT_TRUE(ret);
+}
+
+} //  led_controller_test
