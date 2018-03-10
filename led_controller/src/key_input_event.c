@@ -2,6 +2,7 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <key_input_event.h>
+#include <event_detector.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <stdlib.h>

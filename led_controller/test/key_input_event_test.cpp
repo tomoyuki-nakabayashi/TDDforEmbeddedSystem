@@ -218,10 +218,10 @@ typedef struct EvenCountDetector {
   int32_t counter;
 } EvenCountDetector;
 
-static bool CheckAndIncrement(EventDetector super) {
+static int CheckAndIncrement(EventDetector super) {
   auto self = reinterpret_cast<EvenCountDetector*>(super);
   self->counter++;
-  return ((self->counter % 2) == 0);
+  return ((self->counter % 2) == 0) ? EVENT_DETECTED : EVENT_NOT_DETECTED;
 }
 
 static EventDetectorInterfaceStruct interface = {
@@ -232,11 +232,11 @@ TEST_F(EvenCountDetectorTest, EvenCountDetector) {
   EvenCountDetector even_detector{};
   even_detector.detector.vtable = &interface;
 
-  auto ret = CommandExecute(reinterpret_cast<EventDetector>(&even_detector));
-  EXPECT_FALSE(ret);
+  auto ret = CheckEvent(reinterpret_cast<EventDetector>(&even_detector));
+  EXPECT_EQ(EVENT_NOT_DETECTED, ret);
 
-  ret = CommandExecute(reinterpret_cast<EventDetector>(&even_detector));
-  EXPECT_TRUE(ret);
+  ret = CheckEvent(reinterpret_cast<EventDetector>(&even_detector));
+  EXPECT_EQ(EVENT_DETECTED, ret);
 }
 
 } //  led_controller_test

@@ -10,6 +10,12 @@ extern "C" {
 
 #include <stdbool.h>
 
+enum {
+  EVENT_DETECTED = 0,
+  EVENT_NOT_DETECTED = -1,
+  EVENT_ERROR = -2,
+};
+
 typedef struct EventDetectorInterfaceStruct *EventDetectorInterface;
 typedef struct EventDetectorStruct *EventDetector;
 
@@ -18,10 +24,10 @@ typedef struct EventDetectorStruct {
 } EventDetectorStruct;
 
 typedef struct EventDetectorInterfaceStruct {
-  bool (*CheckEvent)(EventDetector);
+  int (*CheckEvent)(EventDetector);
 } EventDetectorInterfaceStruct;
 
-inline bool CommandExecute(EventDetector detector) {
+inline int CheckEvent(EventDetector detector) {
   return detector->vtable->CheckEvent(detector);
 }
 
