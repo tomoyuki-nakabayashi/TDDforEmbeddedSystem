@@ -12,13 +12,41 @@
 #include <utils/logger.h>
 
 typedef struct KeyInputDeviceStruct {
+  EventDetectorStruct base;
   int fd;
   struct libevdev *evdev;
   struct input_event target_event;
 } KeyInputDeviceStruct;
 
+static bool HasPendingEvent(struct libevdev *evdev, struct input_event *ev) {
+  return libevdev_next_event(evdev, LIBEVDEV_READ_FLAG_NORMAL, ev)
+          == LIBEVDEV_READ_STATUS_SUCCESS;
+}
+
+static bool IsTargetEvent(const struct input_event *target,
+                          const struct input_event *ev) {
+  return (target->type == ev->type
+       && target->code == ev->code
+       && target->value == ev->value);
+}
+
+static int CheckKeyInputEvent(EventDetector base) {
+  KeyInputDevice self = (KeyInputDevice)base;
+  if (self == NULL || self->evdev == NULL) return EVENT_ERROR;
+  struct input_event ev = {};
+  if (HasPendingEvent(self->evdev, &ev) && IsTargetEvent(&self->target_event, &ev)) {
+    return EVENT_DETECTED;
+  }
+  return EVENT_NOT_DETECTED;
+}
+
+static EventDetectorInterfaceStruct interface = {
+  .CheckEvent = CheckKeyInputEvent
+};
+
 KeyInputDevice CreateKeyInputDevice() {
   KeyInputDevice dev = calloc(1, sizeof(KeyInputDeviceStruct));
+  dev->base.vtable = &interface;
   dev->fd = -1;
   dev->evdev = NULL;
 
@@ -46,18 +74,6 @@ int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev)
   // Should I validate ev, here?
   memcpy(&dev->target_event, ev, sizeof(struct input_event));
   return INPUT_DEV_SUCCESS;
-}
-
-static bool HasPendingEvent(struct libevdev *evdev, struct input_event *ev) {
-  return libevdev_next_event(evdev, LIBEVDEV_READ_FLAG_NORMAL, ev)
-          == LIBEVDEV_READ_STATUS_SUCCESS;
-}
-
-static bool IsTargetEvent(const struct input_event *target,
-                          const struct input_event *ev) {
-  return (target->type == ev->type
-       && target->code == ev->code
-       && target->value == ev->value);
 }
 
 int CheckKeyInput(KeyInputDevice dev) {

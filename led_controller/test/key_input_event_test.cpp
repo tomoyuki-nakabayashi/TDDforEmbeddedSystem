@@ -166,6 +166,14 @@ TEST_F(KeyInputEventDetectionTest, DetectTargetEvent) {
   EXPECT_EQ(INPUT_DEV_EVENT_DETECTED, CheckKeyInput(dev_));
 }
 
+TEST_F(KeyInputEventDetectionTest, DetectUsingInterface) {
+  EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _)).WillOnce(
+    DoAll(SetArgPointee<2>(kPressA), Return(LIBEVDEV_READ_STATUS_SUCCESS)));
+
+  SetKeyInputDetectCondition(dev_, &kPressA);
+  EXPECT_EQ(EVENT_DETECTED, CheckEvent((EventDetector)dev_));
+}
+
 TEST_F(KeyInputEventDetectionTest, CannotDetectEvent) {
   EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _))
     .WillOnce(Return(-EAGAIN));
