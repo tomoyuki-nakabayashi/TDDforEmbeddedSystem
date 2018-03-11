@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <stddef.h>
 
 enum {
   EVENT_DETECTED = 0,
@@ -28,6 +29,7 @@ typedef struct EventDetectorInterfaceStruct {
 } EventDetectorInterfaceStruct;
 
 inline int CheckEvent(EventDetector detector) {
+  if (detector == NULL) return EVENT_ERROR;
   return detector->vtable->CheckEvent(detector);
 }
 

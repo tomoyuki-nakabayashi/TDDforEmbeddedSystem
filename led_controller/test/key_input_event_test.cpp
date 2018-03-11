@@ -130,7 +130,7 @@ TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
   EXPECT_EQ(INPUT_DEV_INVALID_DEV, InitKeyInputDevice(kNullPointer, kFilePath));
   EXPECT_EQ(INPUT_DEV_INVALID_DEV, CleanupKeyInputDevice(kNullPointer));
   EXPECT_EQ(INPUT_DEV_INVALID_DEV, SetKeyInputDetectCondition(kNullPointer, &kPressA));
-  EXPECT_EQ(INPUT_DEV_INVALID_DEV, CheckKeyInput(kNullPointer));
+  EXPECT_EQ(EVENT_ERROR, CheckEvent((EventDetector)kNullPointer));
 }
 
 class KeyInputEventDetectionTest : public ::testing::Test {
@@ -163,7 +163,7 @@ TEST_F(KeyInputEventDetectionTest, DetectTargetEvent) {
     DoAll(SetArgPointee<2>(kPressA), Return(LIBEVDEV_READ_STATUS_SUCCESS)));
 
   SetKeyInputDetectCondition(dev_, &kPressA);
-  EXPECT_EQ(INPUT_DEV_EVENT_DETECTED, CheckKeyInput(dev_));
+  EXPECT_EQ(EVENT_DETECTED, CheckEvent((EventDetector)dev_));
 }
 
 TEST_F(KeyInputEventDetectionTest, DetectUsingInterface) {
@@ -179,7 +179,7 @@ TEST_F(KeyInputEventDetectionTest, CannotDetectEvent) {
     .WillOnce(Return(-EAGAIN));
 
   SetKeyInputDetectCondition(dev_, &kPressA);
-  EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
+  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent((EventDetector)dev_));
 }
 
 TEST_F(KeyInputEventDetectionTest, DetectOnlyInterestedEvent) {
@@ -193,10 +193,10 @@ TEST_F(KeyInputEventDetectionTest, DetectOnlyInterestedEvent) {
     .WillOnce(DoAll(SetArgPointee<2>(kPressA), Return(kSuccess)));
 
   SetKeyInputDetectCondition(dev_, &kPressA);
-  EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
-  EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
-  EXPECT_EQ(INPUT_DEV_NO_EVENT, CheckKeyInput(dev_));
-  EXPECT_EQ(INPUT_DEV_EVENT_DETECTED, CheckKeyInput(dev_));
+  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent((EventDetector)dev_));
+  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent((EventDetector)dev_));
+  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent((EventDetector)dev_));
+  EXPECT_EQ(EVENT_DETECTED, CheckEvent((EventDetector)dev_));
 }
 
 TEST_F(KeyInputEventDetectionTest, FailOperationAfterCleanup) {
@@ -204,7 +204,7 @@ TEST_F(KeyInputEventDetectionTest, FailOperationAfterCleanup) {
 
   auto dev = CreateKeyInputDevice();
   CleanupKeyInputDevice(dev);
-  EXPECT_EQ(INPUT_DEV_INVALID_DEV, CheckKeyInput(dev));
+  EXPECT_EQ(EVENT_ERROR, CheckEvent((EventDetector)dev));
 
   DestroyKeyInputDevice(dev);
 }
