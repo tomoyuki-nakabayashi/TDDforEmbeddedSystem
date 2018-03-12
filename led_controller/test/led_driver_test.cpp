@@ -89,8 +89,11 @@ TEST_F(LedDriverOnOffTest, ToggleLed) {
 }
 
 TEST_F(LedDriverOnOffTest, FailToToggleUninitializedLed) {
+  LedDriver driver = CreateLedDriver();
   EXPECT_CALL(*mock_io, IO_WRITE(_, _, _)).Times(0);
-  ToggleLed(driver_);
+  ToggleLed(driver);
+
+  DestroyLedDriver(driver);
 }
 
 TEST_F(LedDriverOnOffTest, NullPointerGuard) {

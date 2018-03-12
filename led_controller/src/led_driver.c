@@ -23,6 +23,7 @@ LedDriver CreateLedDriver() {
 
 int InitLedDriver(LedDriver self, const char* device_file) {
   self->fd = IO_OPEN(device_file, O_WRONLY|O_NONBLOCK);
+  self->status = LED_TURN_OFF;
   if (self->fd < 0) {
     // TODO: Look into possible errors.
     return LED_DRIVER_INIT_ERROR;
