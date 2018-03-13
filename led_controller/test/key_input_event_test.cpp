@@ -44,14 +44,15 @@ class KeyInputEventTest : public ::testing::Test {
 };
 /* 
 TEST_F(KeyInputEventTest, AbstractUse) {
-  EXPECT_TRUE(InitKeyInputDevice("path to device file."));
-  SetKeyInputEventListener(condition);
+  auto detector = CreateKeyInputDetector("path", condition);
+  EXPECT_NE(nullptr, detector);
+  EXPECT_TRUE(InitDetector(detector));
 
   for (int i = 0; i < 10; i++)
-    EXPECT_FALSE(EventDetected());
-  EXPECT_TRUE(EventDetected());
+    EXPECT_FALSE(CheckEvent(detector));
+  EXPECT_TRUE(CheckEvent(detector));
 
-  EXPECT_TRUE(FinalizeKeyInputDevice());
+  EXPECT_TRUE(CleaupDetector(detector));
 }
 */
 

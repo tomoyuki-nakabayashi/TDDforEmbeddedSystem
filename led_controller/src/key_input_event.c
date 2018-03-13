@@ -2,7 +2,6 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <key_input_event.h>
-#include <event_detector.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -16,6 +15,7 @@ typedef struct KeyInputDeviceStruct {
   int fd;
   struct libevdev *evdev;
   struct input_event target_event;
+  const char *device_file;
 } KeyInputDeviceStruct;
 
 static bool HasPendingEvent(struct libevdev *evdev, struct input_event *ev) {
@@ -43,6 +43,18 @@ static int CheckKeyInputEvent(EventDetector base) {
 static EventDetectorInterfaceStruct interface = {
   .CheckEvent = CheckKeyInputEvent
 };
+
+EventDetector CreateKeyInputDetector(const char *device_file,
+                                     const struct input_event *ev) {
+  KeyInputDevice self = calloc(1, sizeof(KeyInputDeviceStruct));
+  self->base.vtable = &interface;
+  self->fd = -1;
+  self->evdev = NULL;
+  self->device_file = device_file;
+  memcpy(&self->target_event, ev, sizeof(struct input_event));
+
+  return (EventDetector)self;
+}
 
 KeyInputDevice CreateKeyInputDevice() {
   KeyInputDevice dev = calloc(1, sizeof(KeyInputDeviceStruct));

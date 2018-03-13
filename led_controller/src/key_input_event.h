@@ -11,6 +11,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include <linux/input.h>
+#include <event_detector.h>
 
 enum {
   INPUT_DEV_EVENT_DETECTED = 1,
@@ -31,6 +32,12 @@ typedef struct KeyInputDeviceStruct *KeyInputDevice;
 
 // Create an instance.
 KeyInputDevice CreateKeyInputDevice();
+
+// Creates an instance and returns EventDetector interface.
+// params: device_file  Path to target device file.
+//         ev           input_event to be detected by CheckEvent.
+EventDetector CreateKeyInputDetector(const char *device_file,
+                                     const struct input_event *ev);
 
 // Initialize key input device.
 // params: dev  Must create an instance by CreateKeyInputDevice() before use.
