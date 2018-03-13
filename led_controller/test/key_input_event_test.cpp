@@ -61,13 +61,13 @@ TEST_F(KeyInputEventTest, AbstractUse) {
 
 TEST_F(KeyInputEventTest, CanInitInputDevice) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
-  EXPECT_EQ(EVENT_SUCCESS, InitKeyInputDetector(dev_));
+  EXPECT_EQ(EVENT_SUCCESS, InitEventDetector(dev_));
 }
 
 TEST_F(KeyInputEventTest, FailToInitInputDevice) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
     Invoke([](const char*, int) { errno = ENOENT; return -1; }));
-  EXPECT_EQ(EVENT_ERROR, InitKeyInputDetector(dev_));
+  EXPECT_EQ(EVENT_ERROR, InitEventDetector(dev_));
 }
 
 TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
@@ -77,7 +77,7 @@ TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
     Invoke([](const char*, int) { errno = EACCES; return -1; }));
 
-  EXPECT_EQ(EVENT_ERROR, InitKeyInputDetector(dev_));
+  EXPECT_EQ(EVENT_ERROR, InitEventDetector(dev_));
   EXPECT_STREQ("Fail to open file. You may need root permission.",
                spy.get());
 }
@@ -88,14 +88,14 @@ TEST_F(KeyInputEventTest, CanInitEvdev) {
     .WillOnce(Return(0));
 
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(kFileDescriptor));
-  EXPECT_EQ(EVENT_SUCCESS, InitKeyInputDetector(dev_));
+  EXPECT_EQ(EVENT_SUCCESS, InitEventDetector(dev_));
 }
 
 TEST_F(KeyInputEventTest, InitEvdevFailed) {
   EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(_, _))
     .WillOnce(Return(-EBADF));
 
-  EXPECT_EQ(EVENT_ERROR, InitKeyInputDetector(dev_));
+  EXPECT_EQ(EVENT_ERROR, InitEventDetector(dev_));
 }
 
 static void InitHelper(EventDetector dev,
@@ -105,7 +105,7 @@ static void InitHelper(EventDetector dev,
   EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(fd, _))
     .WillOnce(Return(res_evdev_new));
 
-  InitKeyInputDetector(dev);
+  InitEventDetector(dev);
 }
 
 TEST_F(KeyInputEventTest, CanCleanupKeyInputDevice) {
@@ -115,13 +115,13 @@ TEST_F(KeyInputEventTest, CanCleanupKeyInputDevice) {
   EXPECT_CALL(*mock_libevdev, libevdev_free(_)).Times(1);
   EXPECT_CALL(*mock_io, IO_CLOSE(kFd)).WillOnce(Return(0));
 
-  EXPECT_EQ(EVENT_SUCCESS, CleanupKeyInputDevice(dev_));
+  EXPECT_EQ(EVENT_SUCCESS, CleanupEventDetector(dev_));
 }
 
 TEST_F(KeyInputEventTest, CleanupKeyInputDeviceFailed) {
   EXPECT_CALL(*mock_io, IO_CLOSE(-1)).WillOnce(Return(-1));
 
-  EXPECT_EQ(EVENT_ERROR, CleanupKeyInputDevice(dev_));
+  EXPECT_EQ(EVENT_ERROR, CleanupEventDetector(dev_));
 }
 
 static constexpr input_event kPressA {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
@@ -129,8 +129,8 @@ static constexpr input_event kPressA {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSE
 TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
   const KeyInputDevice kNullPointer = NULL;
   const EventDetector kNullDetector = nullptr;
-  EXPECT_EQ(EVENT_ERROR, InitKeyInputDetector(kNullDetector));
-  EXPECT_EQ(EVENT_ERROR, CleanupKeyInputDevice(kNullDetector));
+  EXPECT_EQ(EVENT_ERROR, InitEventDetector(kNullDetector));
+  EXPECT_EQ(EVENT_ERROR, CleanupEventDetector(kNullDetector));
   EXPECT_EQ(EVENT_ERROR, CheckEvent((EventDetector)kNullPointer));
 }
 
@@ -145,7 +145,7 @@ class KeyInputEventDetectionTest : public ::testing::Test {
         Invoke([](int, libevdev **dev) { *dev = reinterpret_cast<libevdev*>(0x12345678); return 0;} )
       ).RetiresOnSaturation();
       EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
-      InitKeyInputDetector(dev_);
+      InitEventDetector(dev_);
     }
 
     virtual void TearDown()
@@ -199,8 +199,8 @@ TEST_F(KeyInputEventDetectionTest, DetectOnlyInterestedEvent) {
 TEST_F(KeyInputEventDetectionTest, FailOperationAfterCleanup) {
   EXPECT_CALL(*mock_libevdev, libevdev_free(_)).Times(1);
 
-  auto dev = CreateKeyInputDetector(kFilePath, &in_ev_);
-  CleanupKeyInputDevice(dev);
+  auto dev = CreateKeyInputDetector(kFilePath, &kPressA);
+  CleanupEventDetector(dev);
   EXPECT_EQ(EVENT_ERROR, CheckEvent(dev));
 
   DestroyKeyInputDevice(dev);
@@ -212,36 +212,6 @@ TEST_F(KeyInputEventDetectionTest, TestFree) {
 
   free(mem);
   EXPECT_EQ(tmp, mem);
-}
-
-
-class EvenCountDetectorTest : public ::testing::Test {
-};
-
-typedef struct EvenCountDetector {
-  EventDetectorStruct detector;
-  int32_t counter;
-} EvenCountDetector;
-
-static int CheckAndIncrement(EventDetector super) {
-  auto self = reinterpret_cast<EvenCountDetector*>(super);
-  self->counter++;
-  return ((self->counter % 2) == 0) ? EVENT_DETECTED : EVENT_NOT_DETECTED;
-}
-
-static EventDetectorInterfaceStruct interface = {
-  CheckAndIncrement
-};
-
-TEST_F(EvenCountDetectorTest, EvenCountDetector) {
-  EvenCountDetector even_detector{};
-  even_detector.detector.vtable = &interface;
-
-  auto ret = CheckEvent(reinterpret_cast<EventDetector>(&even_detector));
-  EXPECT_EQ(EVENT_NOT_DETECTED, ret);
-
-  ret = CheckEvent(reinterpret_cast<EventDetector>(&even_detector));
-  EXPECT_EQ(EVENT_DETECTED, ret);
 }
 
 } //  led_controller_test

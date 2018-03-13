@@ -26,10 +26,14 @@ typedef struct EventDetectorStruct {
 } EventDetectorStruct;
 
 typedef struct EventDetectorInterfaceStruct {
+  int (*Init)(EventDetector);
   int (*CheckEvent)(EventDetector);
+  int (*Cleanup)(EventDetector);
 } EventDetectorInterfaceStruct;
 
+int InitEventDetector(EventDetector detector);
 int CheckEvent(EventDetector detector);
+int CleanupEventDetector(EventDetector detector);
 
 #ifdef __cplusplus
 }

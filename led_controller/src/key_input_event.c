@@ -40,32 +40,7 @@ static int CheckKeyInputEvent(EventDetector base) {
   return EVENT_NOT_DETECTED;
 }
 
-static EventDetectorInterfaceStruct interface = {
-  .CheckEvent = CheckKeyInputEvent
-};
-
-EventDetector CreateKeyInputDetector(const char *device_file,
-                                     const struct input_event *ev) {
-  KeyInputDevice self = calloc(1, sizeof(KeyInputDeviceStruct));
-  self->base.vtable = &interface;
-  self->fd = -1;
-  self->evdev = NULL;
-  self->device_file = device_file;
-  memcpy(&self->target_event, ev, sizeof(struct input_event));
-
-  return (EventDetector)self;
-}
-
-KeyInputDevice CreateKeyInputDevice() {
-  KeyInputDevice dev = calloc(1, sizeof(KeyInputDeviceStruct));
-  dev->base.vtable = &interface;
-  dev->fd = -1;
-  dev->evdev = NULL;
-
-  return dev;
-}
-
-int InitKeyInputDetector(EventDetector super) {
+static int InitKeyInputDetector(EventDetector super) {
   if(super == NULL) return EVENT_ERROR;
   KeyInputDevice self = (KeyInputDevice)super;
 
@@ -82,32 +57,7 @@ int InitKeyInputDetector(EventDetector super) {
   return EVENT_SUCCESS;
 }
 
-int InitKeyInputDevice(KeyInputDevice dev, const char *device_file) {
-  if(dev == NULL) return INPUT_DEV_INVALID_DEV;
-
-  dev->fd = IO_OPEN(device_file, O_RDONLY|O_NONBLOCK);
-  if (dev->fd < 0) {
-    if (errno == EACCES)
-      DEBUG_LOG("Fail to open file. You may need root permission.");
-    return INPUT_DEV_INIT_ERROR;
-  }
-
-  int rc = libevdev_new_from_fd(dev->fd, &dev->evdev);
-  if (rc < 0) return INPUT_DEV_INIT_ERROR;
-
-  return INPUT_DEV_SUCCESS;
-}
-
-int CheckKeyInput(KeyInputDevice dev) {
-  if (dev == NULL || dev->evdev == NULL) return INPUT_DEV_INVALID_DEV;
-  struct input_event ev = {};
-  if (HasPendingEvent(dev->evdev, &ev) && IsTargetEvent(&dev->target_event, &ev)) {
-    return INPUT_DEV_EVENT_DETECTED;
-  }
-  return INPUT_DEV_NO_EVENT;
-}
-
-int CleanupKeyInputDevice(EventDetector super) {
+static int CleanupKeyInputDevice(EventDetector super) {
   if(super == NULL) return EVENT_ERROR;
   KeyInputDevice self = (KeyInputDevice)super;
 
@@ -117,6 +67,24 @@ int CleanupKeyInputDevice(EventDetector super) {
   if (rc < 0) return EVENT_ERROR;
 
   return EVENT_SUCCESS;
+}
+
+static EventDetectorInterfaceStruct interface = {
+  .Init = InitKeyInputDetector,
+  .CheckEvent = CheckKeyInputEvent,
+  .Cleanup = CleanupKeyInputDevice
+};
+
+EventDetector CreateKeyInputDetector(const char *device_file,
+                                     const struct input_event *ev) {
+  KeyInputDevice self = calloc(1, sizeof(KeyInputDeviceStruct));
+  self->base.vtable = &interface;
+  self->fd = -1;
+  self->evdev = NULL;
+  self->device_file = device_file;
+  memcpy(&self->target_event, ev, sizeof(struct input_event));
+
+  return (EventDetector)self;
 }
 
 void DestroyKeyInputDevice(EventDetector super) {
