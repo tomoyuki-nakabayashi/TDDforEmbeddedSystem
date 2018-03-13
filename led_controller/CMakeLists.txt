@@ -5,12 +5,14 @@ add_executable(led_controller
     src/main.c
     src/key_input_event.c
     src/led_driver.c
+    src/event_detector.c
     src/utils/logger.c
     src/os/io.c)
 
 add_executable(unittests
     src/key_input_event.c
     src/led_driver.c
+    src/event_detector.c
     test/key_input_event_test.cpp
     test/led_driver_test.cpp
     test/command_test.cpp

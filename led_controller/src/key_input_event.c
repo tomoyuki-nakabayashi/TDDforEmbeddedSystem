@@ -98,13 +98,6 @@ int InitKeyInputDevice(KeyInputDevice dev, const char *device_file) {
   return INPUT_DEV_SUCCESS;
 }
 
-int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev) {
-  if (dev == NULL) return INPUT_DEV_INVALID_DEV;
-  // Should I validate ev, here?
-  memcpy(&dev->target_event, ev, sizeof(struct input_event));
-  return INPUT_DEV_SUCCESS;
-}
-
 int CheckKeyInput(KeyInputDevice dev) {
   if (dev == NULL || dev->evdev == NULL) return INPUT_DEV_INVALID_DEV;
   struct input_event ev = {};
@@ -114,20 +107,21 @@ int CheckKeyInput(KeyInputDevice dev) {
   return INPUT_DEV_NO_EVENT;
 }
 
-int CleanupKeyInputDevice(KeyInputDevice dev) {
-  if(dev == NULL) return INPUT_DEV_INVALID_DEV;
+int CleanupKeyInputDevice(EventDetector super) {
+  if(super == NULL) return EVENT_ERROR;
+  KeyInputDevice self = (KeyInputDevice)super;
 
-  libevdev_free(dev->evdev);
-  dev->evdev = NULL;
-  int rc = IO_CLOSE(dev->fd);
-  if (rc < 0) return INPUT_DEV_CLEANUP_ERROR;
+  libevdev_free(self->evdev);
+  self->evdev = NULL;
+  int rc = IO_CLOSE(self->fd);
+  if (rc < 0) return EVENT_ERROR;
 
-  return INPUT_DEV_SUCCESS;
+  return EVENT_SUCCESS;
 }
 
-void DestroyKeyInputDevice(KeyInputDevice dev) {
-  if(dev == NULL) return;
+void DestroyKeyInputDevice(EventDetector super) {
+  if(super == NULL) return;
 
-  free(dev);
-  dev = NULL;
+  free(super);
+  super = NULL;
 }

@@ -40,20 +40,10 @@ EventDetector CreateKeyInputDetector(const char *device_file,
                                      const struct input_event *ev);
 
 // Initialize key input device.
-// params: dev  Must create an instance by CreateKeyInputDevice() before use.
-// return: INPUT_DEV_SUCCESS if successfully initialize input device's handler.
-//         INPUT_DEV_INVALID_DEV if dev is not initialized.
-//         Otherwise, INPUT_DEV_INIT_ERROR
-int InitKeyInputDevice(KeyInputDevice dev, const char *device_file);
-
+// params: super Must create an instance by CreateKeyInputDetector() before use.
+// return:EVENT_SUCCESS if successfully initialize input device's handler.
+//         EVENT_ERROR if dev is not initialized.
 int InitKeyInputDetector(EventDetector super);
-
-// Set a condition you want to detect.
-// params: dev  Must initialize an instance by InitKeyInputDevice() before use.
-//         ev   Target event. time member will be ignored.
-// return: INPUT_DEV_SUCCESS if dev has already been initialized.
-//         Otherwire, INPUT_DEV_INVALID_DEV
-int SetKeyInputDetectCondition(KeyInputDevice dev, const struct input_event *ev);
 
 // Check key input you have set by SetKeyInputDetectCondition().
 // params: dev  Must initialize an instance by InitKeyInputDevice() before use.
@@ -68,10 +58,10 @@ int CheckKeyInput(KeyInputDevice dev);
 // return: INPUT_DEV_SUCCESS if no error occurs.
 //         INPUT_DEV_INVALID_DEV if dev is not initialized.
 //         Otherwise, INPUT_DEV_CLEANUP_ERROR
-int CleanupKeyInputDevice(KeyInputDevice dev);
+int CleanupKeyInputDevice(EventDetector super);
 
 // Destroy the instance.
-void DestroyKeyInputDevice(KeyInputDevice dev);
+void DestroyKeyInputDevice(EventDetector super);
 
 #ifdef __cplusplus
 }

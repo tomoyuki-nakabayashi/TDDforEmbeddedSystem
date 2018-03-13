@@ -29,10 +29,7 @@ typedef struct EventDetectorInterfaceStruct {
   int (*CheckEvent)(EventDetector);
 } EventDetectorInterfaceStruct;
 
-inline int CheckEvent(EventDetector detector) {
-  if (detector == NULL) return EVENT_ERROR;
-  return detector->vtable->CheckEvent(detector);
-}
+int CheckEvent(EventDetector detector);
 
 #ifdef __cplusplus
 }
