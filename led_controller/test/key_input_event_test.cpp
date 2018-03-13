@@ -21,11 +21,13 @@ using ::testing::DoAll;
 using ::testing::Invoke;
 using ::testing::SetArgPointee;
 
+static constexpr char kFilePath[]  {"/dev/input/event2"};
+
 class KeyInputEventTest : public ::testing::Test {
  protected:
     virtual void SetUp()
     {
-      dev_ = CreateKeyInputDevice();
+      dev_ = CreateKeyInputDetector(kFilePath, &in_ev_);
       mock_io = new MOCK_IO {};
       mock_libevdev = new MOCK_LIBEVDEV {};
       errno = 0;
@@ -36,11 +38,12 @@ class KeyInputEventTest : public ::testing::Test {
       errno = 0;
       delete mock_libevdev;
       delete mock_io;
-      DestroyKeyInputDevice(dev_);
+      DestroyKeyInputDevice((KeyInputDevice)dev_);
     }
 
  protected:
-    KeyInputDevice dev_;
+    EventDetector dev_;
+    input_event in_ev_;
 };
 /* 
 TEST_F(KeyInputEventTest, AbstractUse) {
@@ -56,17 +59,15 @@ TEST_F(KeyInputEventTest, AbstractUse) {
 }
 */
 
-static constexpr char kFilePath[]  {"/dev/input/event2"};
-
 TEST_F(KeyInputEventTest, CanInitInputDevice) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
-  EXPECT_EQ(INPUT_DEV_SUCCESS, InitKeyInputDevice(dev_, kFilePath));
+  EXPECT_EQ(INPUT_DEV_SUCCESS, InitKeyInputDevice((KeyInputDevice)dev_, kFilePath));
 }
 
 TEST_F(KeyInputEventTest, FailToInitInputDevice) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
     Invoke([](const char*, int) { errno = ENOENT; return -1; }));
-  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice(dev_, "./invalid"));
+  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice((KeyInputDevice)dev_, "./invalid"));
 }
 
 TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
@@ -76,7 +77,7 @@ TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
     Invoke([](const char*, int) { errno = EACCES; return -1; }));
 
-  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice(dev_, kFilePath));
+  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice((KeyInputDevice)dev_, kFilePath));
   EXPECT_STREQ("Fail to open file. You may need root permission.",
                spy.get());
 }
@@ -87,14 +88,14 @@ TEST_F(KeyInputEventTest, CanInitEvdev) {
     .WillOnce(Return(0));
 
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(kFileDescriptor));
-  EXPECT_EQ(INPUT_DEV_SUCCESS, InitKeyInputDevice(dev_, kFilePath));
+  EXPECT_EQ(INPUT_DEV_SUCCESS, InitKeyInputDevice((KeyInputDevice)dev_, kFilePath));
 }
 
 TEST_F(KeyInputEventTest, InitEvdevFailed) {
   EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(_, _))
     .WillOnce(Return(-EBADF));
 
-  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice(dev_, kFilePath));
+  EXPECT_EQ(INPUT_DEV_INIT_ERROR, InitKeyInputDevice((KeyInputDevice)dev_, kFilePath));
 }
 
 static void InitHelper(KeyInputDevice dev,
@@ -110,18 +111,18 @@ static void InitHelper(KeyInputDevice dev,
 
 TEST_F(KeyInputEventTest, CanCleanupKeyInputDevice) {
   constexpr int kFd = 3;
-  InitHelper(dev_, kFilePath, kFd, 0);
+  InitHelper((KeyInputDevice)dev_, kFilePath, kFd, 0);
 
   EXPECT_CALL(*mock_libevdev, libevdev_free(_)).Times(1);
   EXPECT_CALL(*mock_io, IO_CLOSE(kFd)).WillOnce(Return(0));
 
-  EXPECT_EQ(INPUT_DEV_SUCCESS, CleanupKeyInputDevice(dev_));
+  EXPECT_EQ(INPUT_DEV_SUCCESS, CleanupKeyInputDevice((KeyInputDevice)dev_));
 }
 
 TEST_F(KeyInputEventTest, CleanupKeyInputDeviceFailed) {
   EXPECT_CALL(*mock_io, IO_CLOSE(-1)).WillOnce(Return(-1));
 
-  EXPECT_EQ(INPUT_DEV_CLEANUP_ERROR, CleanupKeyInputDevice(dev_));
+  EXPECT_EQ(INPUT_DEV_CLEANUP_ERROR, CleanupKeyInputDevice((KeyInputDevice)dev_));
 }
 
 static constexpr input_event kPressA {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
@@ -140,47 +141,48 @@ class KeyInputEventDetectionTest : public ::testing::Test {
     {
       mock_io = new MOCK_IO {};
       mock_libevdev = new MOCK_LIBEVDEV {};
-      dev_ = CreateKeyInputDevice();
+      dev_ = CreateKeyInputDetector(kFilePath, &in_ev_);
       EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(_, _)).WillOnce(
         Invoke([](int, libevdev **dev) { *dev = reinterpret_cast<libevdev*>(0x12345678); return 0;} )
       ).RetiresOnSaturation();
       EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
-      InitKeyInputDevice(dev_, "dummy");
+      InitKeyInputDevice((KeyInputDevice)dev_, "dummy");
     }
 
     virtual void TearDown()
     {
-      DestroyKeyInputDevice(dev_);
+      DestroyKeyInputDevice((KeyInputDevice)dev_);
       delete mock_libevdev;
       delete mock_io;
     }
 
  protected:
-    KeyInputDevice dev_;
+    EventDetector dev_;
+    input_event in_ev_;
 };
 
 TEST_F(KeyInputEventDetectionTest, DetectTargetEvent) {
   EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _)).WillOnce(
     DoAll(SetArgPointee<2>(kPressA), Return(LIBEVDEV_READ_STATUS_SUCCESS)));
 
-  SetKeyInputDetectCondition(dev_, &kPressA);
-  EXPECT_EQ(EVENT_DETECTED, CheckEvent((EventDetector)dev_));
+  SetKeyInputDetectCondition((KeyInputDevice)dev_, &kPressA);
+  EXPECT_EQ(EVENT_DETECTED, CheckEvent(dev_));
 }
 
 TEST_F(KeyInputEventDetectionTest, DetectUsingInterface) {
   EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _)).WillOnce(
     DoAll(SetArgPointee<2>(kPressA), Return(LIBEVDEV_READ_STATUS_SUCCESS)));
 
-  SetKeyInputDetectCondition(dev_, &kPressA);
-  EXPECT_EQ(EVENT_DETECTED, CheckEvent((EventDetector)dev_));
+  SetKeyInputDetectCondition((KeyInputDevice)dev_, &kPressA);
+  EXPECT_EQ(EVENT_DETECTED, CheckEvent(dev_));
 }
 
 TEST_F(KeyInputEventDetectionTest, CannotDetectEvent) {
   EXPECT_CALL(*mock_libevdev, libevdev_next_event(_, _, _))
     .WillOnce(Return(-EAGAIN));
 
-  SetKeyInputDetectCondition(dev_, &kPressA);
-  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent((EventDetector)dev_));
+  SetKeyInputDetectCondition((KeyInputDevice)dev_, &kPressA);
+  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent(dev_));
 }
 
 TEST_F(KeyInputEventDetectionTest, DetectOnlyInterestedEvent) {
@@ -193,11 +195,11 @@ TEST_F(KeyInputEventDetectionTest, DetectOnlyInterestedEvent) {
     .WillOnce(DoAll(SetArgPointee<2>(kReleaseA), Return(kSuccess)))
     .WillOnce(DoAll(SetArgPointee<2>(kPressA), Return(kSuccess)));
 
-  SetKeyInputDetectCondition(dev_, &kPressA);
-  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent((EventDetector)dev_));
-  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent((EventDetector)dev_));
-  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent((EventDetector)dev_));
-  EXPECT_EQ(EVENT_DETECTED, CheckEvent((EventDetector)dev_));
+  SetKeyInputDetectCondition((KeyInputDevice)dev_, &kPressA);
+  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent(dev_));
+  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent(dev_));
+  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent(dev_));
+  EXPECT_EQ(EVENT_DETECTED, CheckEvent(dev_));
 }
 
 TEST_F(KeyInputEventDetectionTest, FailOperationAfterCleanup) {
