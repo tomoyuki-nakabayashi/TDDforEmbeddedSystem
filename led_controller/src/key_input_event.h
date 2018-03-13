@@ -46,6 +46,8 @@ EventDetector CreateKeyInputDetector(const char *device_file,
 //         Otherwise, INPUT_DEV_INIT_ERROR
 int InitKeyInputDevice(KeyInputDevice dev, const char *device_file);
 
+int InitKeyInputDetector(EventDetector super);
+
 // Set a condition you want to detect.
 // params: dev  Must initialize an instance by InitKeyInputDevice() before use.
 //         ev   Target event. time member will be ignored.

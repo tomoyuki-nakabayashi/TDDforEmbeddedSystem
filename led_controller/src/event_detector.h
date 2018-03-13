@@ -12,7 +12,8 @@ extern "C" {
 #include <stddef.h>
 
 enum {
-  EVENT_DETECTED = 0,
+  EVENT_SUCCESS = 0,
+  EVENT_DETECTED = 1,
   EVENT_NOT_DETECTED = -1,
   EVENT_ERROR = -2,
 };

@@ -113,7 +113,7 @@ TEST_F(LedDriverOnOffTest, CleanupLedDriver) {
 
 TEST_F(LedDriverOnOffTest, FailToCleanupLedDriver) {
   EXPECT_CALL(*mock_io, IO_CLOSE(kFd)).WillOnce(Return(-1));
-  EXPECT_EQ(LED_DRIVER_CLEAUP_ERROR, CleanupLedDriver(driver_));
+  EXPECT_EQ(LED_DRIVER_CLEANUP_ERROR, CleanupLedDriver(driver_));
 }
 
 }  // namespace led_controller_test

@@ -65,6 +65,23 @@ KeyInputDevice CreateKeyInputDevice() {
   return dev;
 }
 
+int InitKeyInputDetector(EventDetector super) {
+  if(super == NULL) return EVENT_ERROR;
+  KeyInputDevice self = (KeyInputDevice)super;
+
+  self->fd = IO_OPEN(self->device_file, O_RDONLY|O_NONBLOCK);
+  if (self->fd < 0) {
+    if (errno == EACCES)
+      DEBUG_LOG("Fail to open file. You may need root permission.");
+    return EVENT_ERROR;
+  }
+
+  int rc = libevdev_new_from_fd(self->fd, &self->evdev);
+  if (rc < 0) return EVENT_ERROR;
+
+  return EVENT_SUCCESS;
+}
+
 int InitKeyInputDevice(KeyInputDevice dev, const char *device_file) {
   if(dev == NULL) return INPUT_DEV_INVALID_DEV;
 

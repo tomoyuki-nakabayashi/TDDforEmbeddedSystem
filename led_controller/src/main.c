@@ -26,7 +26,6 @@ int main(void) {
     DEBUG_LOG("Fail to init led device\n");
     exit(1);
   }
-  TurnOffLed(caps_led);
 
   while(1) {
     if(CheckKeyInput(press_a) == INPUT_DEV_EVENT_DETECTED)
