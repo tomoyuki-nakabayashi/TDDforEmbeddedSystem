@@ -22,6 +22,7 @@ struct KeyInputDeviceStruct;
 typedef struct KeyInputDeviceStruct *KeyInputDevice;
 
 // Creates an instance and returns EventDetector interface.
+// This just allocates a memory area and copies given parameters.
 // params: device_file  Path to target device file.
 //         ev           input_event to be detected by CheckEvent.
 EventDetector CreateKeyInputDetector(const char *device_file,

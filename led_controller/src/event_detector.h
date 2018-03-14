@@ -31,7 +31,14 @@ typedef struct EventDetectorInterfaceStruct {
   int (*Cleanup)(EventDetector);
 } EventDetectorInterfaceStruct;
 
+// Initialize EventDetector.
+// params: detector  A derived EventDetector which has been already created.
+// return: EVENT_DETECTOR_SUCCESS if initialize success.
+//         EVENT_DETECTOR_ERROR, if detector is null or fail to initialize
+//                               in the derived initialization.
 int InitEventDetector(EventDetector detector);
+
+
 int CheckEvent(EventDetector detector);
 int CleanupEventDetector(EventDetector detector);
 
