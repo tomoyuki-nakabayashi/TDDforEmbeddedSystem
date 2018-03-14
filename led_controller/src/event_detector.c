@@ -4,16 +4,16 @@
 #include <event_detector.h>
 
 int InitEventDetector(EventDetector detector) {
-  if (detector == NULL) return EVENT_ERROR;
+  if (detector == NULL) return EVENT_DETECTOR_ERROR;
   return detector->vtable->Init(detector);
 }
 
 int CheckEvent(EventDetector detector) {
-  if (detector == NULL) return EVENT_ERROR;
+  if (detector == NULL) return EVENT_DETECTOR_ERROR;
   return detector->vtable->CheckEvent(detector);
 }
 
 int CleanupEventDetector(EventDetector detector) {
-  if (detector == NULL) return EVENT_ERROR;
+  if (detector == NULL) return EVENT_DETECTOR_ERROR;
   return detector->vtable->Cleanup(detector);
 }

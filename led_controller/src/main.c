@@ -16,7 +16,7 @@ int main(void) {
   struct timeval time = {};
   const struct input_event kPressA = {time, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
   EventDetector press_a = CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA);
-  if (InitEventDetector(press_a) != EVENT_SUCCESS) {
+  if (InitEventDetector(press_a) != EVENT_DETECTOR_SUCCESS) {
     DEBUG_LOG("Fail to init input device\n");
     exit(1);
   }

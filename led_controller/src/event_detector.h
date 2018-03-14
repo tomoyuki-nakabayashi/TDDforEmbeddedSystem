@@ -12,10 +12,10 @@ extern "C" {
 #include <stddef.h>
 
 enum {
-  EVENT_SUCCESS = 0,
+  EVENT_DETECTOR_SUCCESS = 0,
   EVENT_DETECTED = 1,
   EVENT_NOT_DETECTED = -1,
-  EVENT_ERROR = -2,
+  EVENT_DETECTOR_ERROR = -2,
 };
 
 typedef struct EventDetectorInterfaceStruct *EventDetectorInterface;

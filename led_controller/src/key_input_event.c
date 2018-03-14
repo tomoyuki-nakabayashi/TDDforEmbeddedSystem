@@ -32,7 +32,7 @@ static bool IsTargetEvent(const struct input_event *target,
 
 static int CheckKeyInputEvent(EventDetector base) {
   KeyInputDevice self = (KeyInputDevice)base;
-  if (self == NULL || self->evdev == NULL) return EVENT_ERROR;
+  if (self == NULL || self->evdev == NULL) return EVENT_DETECTOR_ERROR;
   struct input_event ev = {};
   if (HasPendingEvent(self->evdev, &ev) && IsTargetEvent(&self->target_event, &ev)) {
     return EVENT_DETECTED;
@@ -41,32 +41,32 @@ static int CheckKeyInputEvent(EventDetector base) {
 }
 
 static int InitKeyInputDetector(EventDetector super) {
-  if(super == NULL) return EVENT_ERROR;
+  if(super == NULL) return EVENT_DETECTOR_ERROR;
   KeyInputDevice self = (KeyInputDevice)super;
 
   self->fd = IO_OPEN(self->device_file, O_RDONLY|O_NONBLOCK);
   if (self->fd < 0) {
     if (errno == EACCES)
       DEBUG_LOG("Fail to open file. You may need root permission.");
-    return EVENT_ERROR;
+    return EVENT_DETECTOR_ERROR;
   }
 
   int rc = libevdev_new_from_fd(self->fd, &self->evdev);
-  if (rc < 0) return EVENT_ERROR;
+  if (rc < 0) return EVENT_DETECTOR_ERROR;
 
-  return EVENT_SUCCESS;
+  return EVENT_DETECTOR_SUCCESS;
 }
 
 static int CleanupKeyInputDevice(EventDetector super) {
-  if(super == NULL) return EVENT_ERROR;
+  if(super == NULL) return EVENT_DETECTOR_ERROR;
   KeyInputDevice self = (KeyInputDevice)super;
 
   libevdev_free(self->evdev);
   self->evdev = NULL;
   int rc = IO_CLOSE(self->fd);
-  if (rc < 0) return EVENT_ERROR;
+  if (rc < 0) return EVENT_DETECTOR_ERROR;
 
-  return EVENT_SUCCESS;
+  return EVENT_DETECTOR_SUCCESS;
 }
 
 static EventDetectorInterfaceStruct interface = {
