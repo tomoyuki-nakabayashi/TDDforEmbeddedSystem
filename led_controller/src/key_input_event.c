@@ -70,7 +70,7 @@ static int CleanupKeyInputDevice(EventDetector super) {
 }
 
 static EventDetectorInterfaceStruct interface = {
-  .Init = InitKeyInputDetector,
+  .Start = InitKeyInputDetector,
   .CheckEvent = CheckKeyInputEvent,
   .Cleanup = CleanupKeyInputDevice
 };

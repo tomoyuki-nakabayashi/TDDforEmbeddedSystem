@@ -35,7 +35,7 @@ TEST_F(TimerEventTest, AbstractUse) {
 
 TEST_F(TimerEventTest, CanInitDetector) {
   auto detector = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
-  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, InitEventDetector(detector));
+  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, StartEventDetector(detector));
   DestroyTimeOutDetector(detector);
 }
 

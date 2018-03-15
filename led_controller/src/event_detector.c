@@ -3,9 +3,9 @@
 
 #include <event_detector.h>
 
-int InitEventDetector(EventDetector detector) {
+int StartEventDetector(EventDetector detector) {
   if (detector == NULL) return EVENT_DETECTOR_ERROR;
-  return detector->vtable->Init(detector);
+  return detector->vtable->Start(detector);
 }
 
 int CheckEvent(EventDetector detector) {

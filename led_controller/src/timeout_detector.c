@@ -23,7 +23,7 @@ static int CleanupTimeOutDetector(EventDetector super) {
 }
 
 static EventDetectorInterfaceStruct interface = {
-  .Init = InitTimeOutDetector,
+  .Start = InitTimeOutDetector,
   .CheckEvent = CheckTimeOut,
   .Cleanup = CleanupTimeOutDetector
 };

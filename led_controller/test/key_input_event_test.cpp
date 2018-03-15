@@ -61,13 +61,13 @@ TEST_F(KeyInputEventTest, AbstractUse) {
 
 TEST_F(KeyInputEventTest, CanInitInputDevice) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
-  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, InitEventDetector(dev_));
+  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, StartEventDetector(dev_));
 }
 
 TEST_F(KeyInputEventTest, FailToInitInputDevice) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
     Invoke([](const char*, int) { errno = ENOENT; return -1; }));
-  EXPECT_EQ(EVENT_DETECTOR_ERROR, InitEventDetector(dev_));
+  EXPECT_EQ(EVENT_DETECTOR_ERROR, StartEventDetector(dev_));
 }
 
 TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
@@ -77,7 +77,7 @@ TEST_F(KeyInputEventTest, FileOpenPermissionDenied) {
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(
     Invoke([](const char*, int) { errno = EACCES; return -1; }));
 
-  EXPECT_EQ(EVENT_DETECTOR_ERROR, InitEventDetector(dev_));
+  EXPECT_EQ(EVENT_DETECTOR_ERROR, StartEventDetector(dev_));
   EXPECT_STREQ("Fail to open file. You may need root permission.",
                spy.get());
 }
@@ -88,14 +88,14 @@ TEST_F(KeyInputEventTest, CanInitEvdev) {
     .WillOnce(Return(0));
 
   EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(kFileDescriptor));
-  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, InitEventDetector(dev_));
+  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, StartEventDetector(dev_));
 }
 
 TEST_F(KeyInputEventTest, InitEvdevFailed) {
   EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(_, _))
     .WillOnce(Return(-EBADF));
 
-  EXPECT_EQ(EVENT_DETECTOR_ERROR, InitEventDetector(dev_));
+  EXPECT_EQ(EVENT_DETECTOR_ERROR, StartEventDetector(dev_));
 }
 
 static void InitHelper(EventDetector dev,
@@ -105,7 +105,7 @@ static void InitHelper(EventDetector dev,
   EXPECT_CALL(*mock_libevdev, libevdev_new_from_fd(fd, _))
     .WillOnce(Return(res_evdev_new));
 
-  InitEventDetector(dev);
+  StartEventDetector(dev);
 }
 
 TEST_F(KeyInputEventTest, CanCleanupKeyInputDevice) {
@@ -129,7 +129,7 @@ static constexpr input_event kPressA {timeval{}, EV_KEY, KEY_A, INPUT_KEY_PRESSE
 TEST_F(KeyInputEventTest, AllApiHaveNullPointerGuard) {
   const KeyInputDevice kNullPointer = NULL;
   const EventDetector kNullDetector = nullptr;
-  EXPECT_EQ(EVENT_DETECTOR_ERROR, InitEventDetector(kNullDetector));
+  EXPECT_EQ(EVENT_DETECTOR_ERROR, StartEventDetector(kNullDetector));
   EXPECT_EQ(EVENT_DETECTOR_ERROR, CleanupEventDetector(kNullDetector));
   EXPECT_EQ(EVENT_DETECTOR_ERROR, CheckEvent((EventDetector)kNullPointer));
 }
@@ -146,7 +146,7 @@ class KeyInputEventDetectionTest : public ::testing::Test {
           *dev = reinterpret_cast<libevdev*>(0x12345678); return 0;} )
       ).RetiresOnSaturation();
       EXPECT_CALL(*mock_io, IO_OPEN(_, _)).WillOnce(Return(3));
-      InitEventDetector(dev_);
+      StartEventDetector(dev_);
     }
 
     virtual void TearDown()
