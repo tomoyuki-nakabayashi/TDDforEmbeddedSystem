@@ -6,18 +6,8 @@
 #include <timeout_detector.h>
 
 namespace led_controller_test {
-class TimerEventTest : public ::testing::Test {
- protected:
-    virtual void SetUp()
-    {
-    }
-
-    virtual void TearDown()
-    {
-    }
-
- protected:
-    EventDetector detector_;
+using ::testing::Return;
+class CreateTimerEventTest : public ::testing::Test {
 };
 /* 
 TEST_F(TimerEventTest, AbstractUse) {
@@ -33,10 +23,29 @@ TEST_F(TimerEventTest, AbstractUse) {
 }
 */
 
-TEST_F(TimerEventTest, CanInitDetector) {
-  auto detector = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
+TEST_F(CreateTimerEventTest, CanInitDetector) {
+  auto detector = CreateTimeOutDetector(5, TIMER_ONE_SHOT);
   EXPECT_EQ(EVENT_DETECTOR_SUCCESS, StartEventDetector(detector));
   DestroyTimeOutDetector(detector);
 }
+
+TEST_F(CreateTimerEventTest, FailToInitDetectorWithInvalidFlag) {
+  auto detector = CreateTimeOutDetector(5, -1);
+  EXPECT_EQ(EVENT_DETECTOR_ERROR, StartEventDetector(detector));
+  DestroyTimeOutDetector(detector);
+}
+
+class TimerEventTest : public ::testing::Test {
+ protected:
+    void SetUp() override {
+      detector_ = CreateTimeOutDetector(5, TIMER_ONE_SHOT);
+    }
+
+    void TearDown() override {
+    }
+
+ protected:
+    EventDetector detector_;
+};
 
 }  // namespace led_controller_test

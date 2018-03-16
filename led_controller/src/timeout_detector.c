@@ -6,11 +6,18 @@
 
 typedef struct TimeOutDetectorStruct {
   EventDetectorStruct base;
-  int32_t interval_msec;
+  uint32_t interval_sec;
   int32_t flag;
 } TimeOutDetectorStruct;
 
-static int InitTimeOutDetector(EventDetector super) {
+static bool IsValidFlag(int32_t flag) {
+  return (flag == TIMER_ONE_SHOT || flag == TIMER_REPEATEDLY);
+}
+
+static int StartTimeOutDetector(EventDetector super) {
+  TimeOutDetector self = (TimeOutDetector)super;
+  if (!IsValidFlag(self->flag)) return EVENT_DETECTOR_ERROR;
+
   return EVENT_DETECTOR_SUCCESS;
 }
 
@@ -23,16 +30,16 @@ static int CleanupTimeOutDetector(EventDetector super) {
 }
 
 static EventDetectorInterfaceStruct interface = {
-  .Start = InitTimeOutDetector,
+  .Start = StartTimeOutDetector,
   .CheckEvent = CheckTimeOut,
   .Cleanup = CleanupTimeOutDetector
 };
 
-EventDetector CreateTimeOutDetector(const int32_t interval_msec,
+EventDetector CreateTimeOutDetector(const uint32_t interval_sec,
                                     const int32_t flag) {
   TimeOutDetector detector = calloc(1, sizeof(TimeOutDetectorStruct));
   detector->base.vtable = &interface;
-  detector->interval_msec = interval_msec;
+  detector->interval_sec = interval_sec;
   detector->flag = flag;
 
   return (EventDetector)detector;

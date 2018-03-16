@@ -19,8 +19,8 @@ enum {
   TIMER_REPEATEDLY = 1,
 };
 
-EventDetector CreateTimeOutDetector(const int32_t interval_msec,
-                                    const int flag);
+EventDetector CreateTimeOutDetector(const uint32_t interval_msec,
+                                    const int32_t flag);
 
 void DestroyTimeOutDetector(EventDetector self);
 
