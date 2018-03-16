@@ -1,13 +1,24 @@
 // Copyright <2018> <Tomoyuki Nakabayashi>
 // This software is released under the MIT License, see LICENSE.
 
-#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <event_detector.h>
 #include <timeout_detector.h>
+#include <os/mock_time.h>
+
+MOCK_TIME *mock_time {};
 
 namespace led_controller_test {
 using ::testing::Return;
 class CreateTimerEventTest : public ::testing::Test {
+ protected:
+    void SetUp() override {
+      mock_time = new MOCK_TIME{};
+    }
+
+    void TearDown() override {
+      delete mock_time;
+    }
 };
 /* 
 TEST_F(TimerEventTest, AbstractUse) {
@@ -24,13 +35,13 @@ TEST_F(TimerEventTest, AbstractUse) {
 */
 
 TEST_F(CreateTimerEventTest, CanInitDetector) {
-  auto detector = CreateTimeOutDetector(5, TIMER_ONE_SHOT);
+  auto detector = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
   EXPECT_EQ(EVENT_DETECTOR_SUCCESS, StartEventDetector(detector));
   DestroyTimeOutDetector(detector);
 }
 
 TEST_F(CreateTimerEventTest, FailToInitDetectorWithInvalidFlag) {
-  auto detector = CreateTimeOutDetector(5, -1);
+  auto detector = CreateTimeOutDetector(5000, -1);
   EXPECT_EQ(EVENT_DETECTOR_ERROR, StartEventDetector(detector));
   DestroyTimeOutDetector(detector);
 }
@@ -38,14 +49,37 @@ TEST_F(CreateTimerEventTest, FailToInitDetectorWithInvalidFlag) {
 class TimerEventTest : public ::testing::Test {
  protected:
     void SetUp() override {
-      detector_ = CreateTimeOutDetector(5, TIMER_ONE_SHOT);
+      detector_ = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
+      mock_time = new MOCK_TIME{};
     }
 
     void TearDown() override {
+      delete mock_time;
     }
 
  protected:
     EventDetector detector_;
 };
+
+TEST_F(TimerEventTest, DetectTimeOut) {
+  EXPECT_CALL(*mock_time, GET_MSEC_OF_DAY())
+    .WillOnce(Return(0))
+    .WillOnce(Return(4999))
+    .WillOnce(Return(5000));
+
+  StartEventDetector(detector_);
+  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent(detector_));
+  EXPECT_EQ(EVENT_DETECTED, CheckEvent(detector_));
+}
+
+TEST_F(TimerEventTest, DetectOnlyOnce) {
+  EXPECT_CALL(*mock_time, GET_MSEC_OF_DAY())
+    .WillOnce(Return(0))
+    .WillOnce(Return(5001));
+
+  StartEventDetector(detector_);
+  EXPECT_EQ(EVENT_DETECTED, CheckEvent(detector_));
+  EXPECT_EQ(EVENT_DETECTOR_ERROR, CheckEvent(detector_));
+}
 
 }  // namespace led_controller_test

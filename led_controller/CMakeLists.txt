@@ -8,7 +8,8 @@ add_executable(led_controller
     src/timeout_detector.c
     src/led_driver.c
     src/utils/logger.c
-    src/os/io.c)
+    src/os/io.c
+    src/os/time.c)
 
 add_executable(unittests
     src/key_input_event.c
