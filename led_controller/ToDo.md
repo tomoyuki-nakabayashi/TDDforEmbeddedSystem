@@ -24,7 +24,7 @@
 - [x] Move specific struct definition into private header.
 - [x] Check null pointer check.
 - [x] evdev operation fails after cleanup().
-- [ ] Extract Detect interface.
+- [x] Extract Detect interface.
 - [ ] input event factory.
 
 ## LED Brightness
@@ -36,6 +36,15 @@
 - [x] Turn off if LED is on.
 - [x] Toggle LED.
 - [ ] Extract Operate interface.
+
+## Timer event
+
+- [x] Create timer.
+- [x] Start timer.
+- [x] Detect timeout.
+- [ ] Detect wrapped timeout.
+- [ ] Oneshot.
+- [ ] Repeatedly.
 
 ## Engine control command
 

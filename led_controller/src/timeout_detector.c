@@ -9,7 +9,7 @@ typedef struct TimeOutDetectorStruct {
   EventDetectorStruct base;
   uint32_t interval_msec;
   int32_t flag;
-  uint64_t start_time;
+  uint32_t start_time;
   bool timer_started;
 } TimeOutDetectorStruct;
 
@@ -26,7 +26,7 @@ static int StartTimeOutDetector(EventDetector super) {
   return EVENT_DETECTOR_SUCCESS;
 }
 
-static int IsTimedOut(uint64_t now, uint64_t start, uint32_t interval) {
+static int IsTimedOut(uint32_t now, uint32_t start, uint32_t interval) {
   return (now - start >= interval);
 }
 
@@ -34,7 +34,7 @@ static int CheckTimeOut(EventDetector super) {
   TimeOutDetector self = (TimeOutDetector)super;
   if (!self->timer_started) return EVENT_DETECTOR_ERROR;
 
-  uint64_t now = GET_MSEC_OF_DAY();
+  uint32_t now = GET_MSEC_OF_DAY();
   if (IsTimedOut(now, self->start_time, self->interval_msec)) {
     self->timer_started = false;
     return EVENT_DETECTED;

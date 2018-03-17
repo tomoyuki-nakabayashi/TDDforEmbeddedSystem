@@ -82,4 +82,15 @@ TEST_F(TimerEventTest, DetectOnlyOnce) {
   EXPECT_EQ(EVENT_DETECTOR_ERROR, CheckEvent(detector_));
 }
 
+TEST_F(TimerEventTest, DetectWrappedTime) {
+  EXPECT_CALL(*mock_time, GET_MSEC_OF_DAY())
+    .WillOnce(Return(UINT32_MAX))
+    .WillOnce(Return(4998))
+    .WillOnce(Return(4999));
+
+  StartEventDetector(detector_);
+  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent(detector_));
+  EXPECT_EQ(EVENT_DETECTED, CheckEvent(detector_));
+}
+
 }  // namespace led_controller_test
