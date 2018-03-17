@@ -1,7 +1,7 @@
 // Copyright <2018> <Tomoyuki Nakabayashi>
 // This software is released under the MIT License, see LICENSE.
 
-#include <timeout_detector.h>
+#include <detector/timeout_detector.h>
 #include <stdlib.h>
 #include <os/time.h>
 

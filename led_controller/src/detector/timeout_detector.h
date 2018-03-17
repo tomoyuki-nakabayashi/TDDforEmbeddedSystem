@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <event_detector.h>
+#include <detector/event_detector.h>
 
 struct TimeOutDetectorStruct;
 typedef struct TimeOutDetectorStruct *TimeOutDetector;

@@ -4,8 +4,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <key_input_event.h>
-#include <event_detector.h>
+#include <detector/key_input_event.h>
+#include <detector/event_detector.h>
 #include <led_driver.h>
 #include <utils/logger.h>
 

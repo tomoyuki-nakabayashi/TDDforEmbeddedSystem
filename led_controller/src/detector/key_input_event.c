@@ -1,7 +1,7 @@
 // Copyright <2018> <Tomoyuki Nakabayashi>
 // This software is released under the MIT License, see LICENSE.
 
-#include <key_input_event.h>
+#include <detector/key_input_event.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <stdlib.h>

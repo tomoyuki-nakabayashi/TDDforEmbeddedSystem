@@ -11,7 +11,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include <linux/input.h>
-#include <event_detector.h>
+#include <detector/event_detector.h>
 
 enum {
   INPUT_KEY_RELEASED = 0,

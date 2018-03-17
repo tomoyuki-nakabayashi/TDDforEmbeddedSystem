@@ -1,7 +1,7 @@
 // Copyright <2018> <Tomoyuki Nakabayashi>
 // This software is released under the MIT License, see LICENSE.
 
-#include <event_detector.h>
+#include <detector/event_detector.h>
 
 int StartEventDetector(EventDetector detector) {
   if (detector == NULL) return EVENT_DETECTOR_ERROR;
