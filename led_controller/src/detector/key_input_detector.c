@@ -10,13 +10,13 @@
 #include <os/io.h>
 #include <utils/logger.h>
 
-typedef struct KeyInputDeviceStruct {
+typedef struct KeyInputDetectorStruct {
   EventDetectorStruct base;
   int fd;
   struct libevdev *evdev;
   struct input_event target_event;
   const char *device_file;
-} KeyInputDeviceStruct;
+} KeyInputDetectorStruct;
 
 static bool HasPendingEvent(struct libevdev *evdev, struct input_event *ev) {
   return libevdev_next_event(evdev, LIBEVDEV_READ_FLAG_NORMAL, ev)
@@ -31,53 +31,53 @@ static bool IsTargetEvent(const struct input_event *target,
 }
 
 static int CheckKeyInputEvent(EventDetector base) {
-  KeyInputDevice self = (KeyInputDevice)base;
-  if (self == NULL || self->evdev == NULL) return EVENT_DETECTOR_ERROR;
+  KeyInputDetector self = (KeyInputDetector)base;
+  if (self == NULL || self->evdev == NULL) return DETECTOR_ERROR;
   struct input_event ev = {};
   if (HasPendingEvent(self->evdev, &ev) && IsTargetEvent(&self->target_event, &ev)) {
-    return EVENT_DETECTED;
+    return DETECTOR_EVENT_DETECTED;
   }
-  return EVENT_NOT_DETECTED;
+  return DETECTOR_EVENT_NOT_DETECTED;
 }
 
 static int InitKeyInputDetector(EventDetector super) {
-  if(super == NULL) return EVENT_DETECTOR_ERROR;
-  KeyInputDevice self = (KeyInputDevice)super;
+  if(super == NULL) return DETECTOR_ERROR;
+  KeyInputDetector self = (KeyInputDetector)super;
 
   self->fd = IO_OPEN(self->device_file, O_RDONLY|O_NONBLOCK);
   if (self->fd < 0) {
     if (errno == EACCES)
       DEBUG_LOG("Fail to open file. You may need root permission.");
-    return EVENT_DETECTOR_ERROR;
+    return DETECTOR_ERROR;
   }
 
   int rc = libevdev_new_from_fd(self->fd, &self->evdev);
-  if (rc < 0) return EVENT_DETECTOR_ERROR;
+  if (rc < 0) return DETECTOR_ERROR;
 
-  return EVENT_DETECTOR_SUCCESS;
+  return DETECTOR_SUCCESS;
 }
 
-static int CleanupKeyInputDevice(EventDetector super) {
-  if(super == NULL) return EVENT_DETECTOR_ERROR;
-  KeyInputDevice self = (KeyInputDevice)super;
+static int CleanupKeyInputDetector(EventDetector super) {
+  if(super == NULL) return DETECTOR_ERROR;
+  KeyInputDetector self = (KeyInputDetector)super;
 
   libevdev_free(self->evdev);
   self->evdev = NULL;
   int rc = IO_CLOSE(self->fd);
-  if (rc < 0) return EVENT_DETECTOR_ERROR;
+  if (rc < 0) return DETECTOR_ERROR;
 
-  return EVENT_DETECTOR_SUCCESS;
+  return DETECTOR_SUCCESS;
 }
 
 static EventDetectorInterfaceStruct interface = {
   .Start = InitKeyInputDetector,
   .CheckEvent = CheckKeyInputEvent,
-  .Cleanup = CleanupKeyInputDevice
+  .Cleanup = CleanupKeyInputDetector
 };
 
 EventDetector CreateKeyInputDetector(const char *device_file,
                                      const struct input_event *ev) {
-  KeyInputDevice self = calloc(1, sizeof(KeyInputDeviceStruct));
+  KeyInputDetector self = calloc(1, sizeof(KeyInputDetectorStruct));
   self->base.vtable = &interface;
   self->fd = -1;
   self->evdev = NULL;
@@ -87,7 +87,7 @@ EventDetector CreateKeyInputDetector(const char *device_file,
   return (EventDetector)self;
 }
 
-void DestroyKeyInputDevice(EventDetector super) {
+void DestroyKeyInputDetector(EventDetector super) {
   if(super == NULL) return;
 
   free(super);

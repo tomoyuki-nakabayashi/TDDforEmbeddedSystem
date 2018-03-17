@@ -1,8 +1,8 @@
 // Copyright <2018> <Tomoyuki Nakabayashi>
 // This software is released under the MIT License, see LICENSE.
 
-#ifndef LED_CONTROLLER_KEY_INPUT_EVENT_H_
-#define LED_CONTROLLER_KEY_INPUT_EVENT_H_
+#ifndef LED_CONTROLLER_KEY_INPUT_DETECTOR_H_
+#define LED_CONTROLLER_KEY_INPUT_DETECTOR_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,8 +18,8 @@ enum {
   INPUT_KEY_PRESSED = 1,
 };
 
-struct KeyInputDeviceStruct;
-typedef struct KeyInputDeviceStruct *KeyInputDevice;
+struct KeyInputDetectorStruct;
+typedef struct KeyInputDetectorStruct *KeyInputDetector;
 
 // Creates an instance and returns EventDetector interface.
 // This just allocates a memory area and copies given parameters.
@@ -29,10 +29,10 @@ EventDetector CreateKeyInputDetector(const char *device_file,
                                      const struct input_event *ev);
 
 // Destroy the instance.
-void DestroyKeyInputDevice(EventDetector super);
+void DestroyKeyInputDetector(EventDetector super);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // LED_CONTROLLER_KEY_INPUT_EVENT_H_
+#endif  // LED_CONTROLLER_KEY_INPUT_DETECTOR_H_

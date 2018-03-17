@@ -12,10 +12,13 @@ extern "C" {
 #include <stddef.h>
 
 enum {
-  EVENT_DETECTOR_SUCCESS = 0,
-  EVENT_DETECTED = 1,
-  EVENT_NOT_DETECTED = -1,
-  EVENT_DETECTOR_ERROR = -2,
+  DETECTOR_SUCCESS = 0,
+  DETECTOR_EVENT_DETECTED = 1,
+  DETECTOR_EVENT_NOT_DETECTED = 2,
+  DETECTOR_ERROR = -1,
+  DETECTOR_INVALID_PARAMS = -2,
+  DETECTOR_INVALID_DETECTOR = -3,
+  DETECOTR_NOT_INITIALIZED = -4,
 };
 
 typedef struct EventDetectorInterfaceStruct *EventDetectorInterface;
@@ -33,16 +36,16 @@ typedef struct EventDetectorInterfaceStruct {
 
 // Initialize EventDetector.
 // params: detector  A derived EventDetector which has been already created.
-// return: EVENT_DETECTOR_SUCCESS if initialize success.
-//         EVENT_DETECTOR_ERROR, if detector is null or fail to initialize
+// return: DETECTOR_SUCCESS if initialize success.
+//         DETECTOR_ERROR, if detector is null or fail to initialize
 //                               in the derived initialization.
 int StartEventDetector(EventDetector detector);
 
 // Check event occurance of the detector.
 // params: detecor  A derived EventDetector which has been already Start.
-// return: EVENT_DETECTED if target event has been detected.
-//         EVENT_NOT_DETECTED if target event han NOT been detected.
-//         EVENT_DETECTOR_ERROR if an error occurs e.g., detector is not initialized.
+// return: DETECTOR_EVENT_DETECTED if target event has been detected.
+//         DETECTOR_EVENT_NOT_DETECTED if target event han NOT been detected.
+//         DETECTOR_ERROR if an error occurs e.g., detector is not initialized.
 int CheckEvent(EventDetector detector);
 
 // Cleanup detector.

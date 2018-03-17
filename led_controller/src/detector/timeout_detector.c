@@ -19,11 +19,11 @@ static bool IsValidFlag(int32_t flag) {
 
 static int StartTimeOutDetector(EventDetector super) {
   TimeOutDetector self = (TimeOutDetector)super;
-  if (!IsValidFlag(self->flag)) return EVENT_DETECTOR_ERROR;
+  if (!IsValidFlag(self->flag)) return DETECTOR_ERROR;
   self->start_time = GET_MSEC_OF_DAY();
   self->timer_started = true;
 
-  return EVENT_DETECTOR_SUCCESS;
+  return DETECTOR_SUCCESS;
 }
 
 static int IsTimedOut(const uint32_t now,
@@ -34,15 +34,15 @@ static int IsTimedOut(const uint32_t now,
 
 static int CheckTimeOut(EventDetector super) {
   TimeOutDetector self = (TimeOutDetector)super;
-  if (!self->timer_started) return EVENT_DETECTOR_ERROR;
+  if (!self->timer_started) return DETECTOR_ERROR;
 
   uint32_t now = GET_MSEC_OF_DAY();
   if (IsTimedOut(now, self->start_time, self->interval_msec)) {
     self->timer_started = false;
-    return EVENT_DETECTED;
+    return DETECTOR_EVENT_DETECTED;
   }
 
-  return EVENT_NOT_DETECTED;
+  return DETECTOR_EVENT_NOT_DETECTED;
 }
 
 static int CleanupTimeOutDetector(EventDetector super) {
@@ -50,7 +50,7 @@ static int CleanupTimeOutDetector(EventDetector super) {
   self->start_time = 0;
   self->timer_started = false;
 
-  return EVENT_DETECTOR_SUCCESS;
+  return DETECTOR_SUCCESS;
 }
 
 static EventDetectorInterfaceStruct interface = {

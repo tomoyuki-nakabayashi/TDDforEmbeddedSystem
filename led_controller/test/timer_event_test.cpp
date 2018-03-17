@@ -24,25 +24,25 @@ class CreateTimerEventTest : public ::testing::Test {
 TEST_F(TimerEventTest, AbstractUse) {
   auto detector = CreateTimerDetector(condition);
   EXPECT_NE(nullptr, detector);
-  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, InitDetector(detector));
+  EXPECT_EQ(DETECTOR_SUCCESS, InitDetector(detector));
 
   for (int i = 0; i < 10; i++)
-    EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent(detector));
-  EXPECT_EQ(EVENT_DETECTED, CheckEvent(detector));
+    EXPECT_EQ(DETECTOR_EVENT_NOT_DETECTED, CheckEvent(detector));
+  EXPECT_EQ(DETECTOR_EVENT_DETECTED, CheckEvent(detector));
 
-  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, CleaupDetector(detector));
+  EXPECT_EQ(DETECTOR_SUCCESS, CleaupDetector(detector));
 }
 */
 
 TEST_F(CreateTimerEventTest, CanInitDetector) {
   auto detector = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
-  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, StartEventDetector(detector));
+  EXPECT_EQ(DETECTOR_SUCCESS, StartEventDetector(detector));
   DestroyTimeOutDetector(detector);
 }
 
 TEST_F(CreateTimerEventTest, FailToInitDetectorWithInvalidFlag) {
   auto detector = CreateTimeOutDetector(5000, -1);
-  EXPECT_EQ(EVENT_DETECTOR_ERROR, StartEventDetector(detector));
+  EXPECT_EQ(DETECTOR_ERROR, StartEventDetector(detector));
   DestroyTimeOutDetector(detector);
 }
 
@@ -68,8 +68,8 @@ TEST_F(TimerEventTest, DetectTimeOut) {
     .WillOnce(Return(5000));
 
   StartEventDetector(detector_);
-  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent(detector_));
-  EXPECT_EQ(EVENT_DETECTED, CheckEvent(detector_));
+  EXPECT_EQ(DETECTOR_EVENT_NOT_DETECTED, CheckEvent(detector_));
+  EXPECT_EQ(DETECTOR_EVENT_DETECTED, CheckEvent(detector_));
 }
 
 TEST_F(TimerEventTest, DetectOnlyOnce) {
@@ -78,8 +78,8 @@ TEST_F(TimerEventTest, DetectOnlyOnce) {
     .WillOnce(Return(5001));
 
   StartEventDetector(detector_);
-  EXPECT_EQ(EVENT_DETECTED, CheckEvent(detector_));
-  EXPECT_EQ(EVENT_DETECTOR_ERROR, CheckEvent(detector_));
+  EXPECT_EQ(DETECTOR_EVENT_DETECTED, CheckEvent(detector_));
+  EXPECT_EQ(DETECTOR_ERROR, CheckEvent(detector_));
 }
 
 TEST_F(TimerEventTest, DetectWrappedTime) {
@@ -89,20 +89,20 @@ TEST_F(TimerEventTest, DetectWrappedTime) {
     .WillOnce(Return(4999));
 
   StartEventDetector(detector_);
-  EXPECT_EQ(EVENT_NOT_DETECTED, CheckEvent(detector_));
-  EXPECT_EQ(EVENT_DETECTED, CheckEvent(detector_));
+  EXPECT_EQ(DETECTOR_EVENT_NOT_DETECTED, CheckEvent(detector_));
+  EXPECT_EQ(DETECTOR_EVENT_DETECTED, CheckEvent(detector_));
 }
 
 TEST_F(TimerEventTest, CleanupTimeOutDetector) {
   StartEventDetector(detector_);
-  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, CleanupEventDetector(detector_));
-  EXPECT_EQ(EVENT_DETECTOR_ERROR, CheckEvent(detector_));
+  EXPECT_EQ(DETECTOR_SUCCESS, CleanupEventDetector(detector_));
+  EXPECT_EQ(DETECTOR_ERROR, CheckEvent(detector_));
 }
 
 TEST_F(TimerEventTest, NullPointerGuard) {
-  EXPECT_EQ(EVENT_DETECTOR_ERROR, StartEventDetector(nullptr));
-  EXPECT_EQ(EVENT_DETECTOR_ERROR, CheckEvent(nullptr));
-  EXPECT_EQ(EVENT_DETECTOR_ERROR, CleanupEventDetector(nullptr));
+  EXPECT_EQ(DETECTOR_ERROR, StartEventDetector(nullptr));
+  EXPECT_EQ(DETECTOR_ERROR, CheckEvent(nullptr));
+  EXPECT_EQ(DETECTOR_ERROR, CleanupEventDetector(nullptr));
 }
 
 }  // namespace led_controller_test

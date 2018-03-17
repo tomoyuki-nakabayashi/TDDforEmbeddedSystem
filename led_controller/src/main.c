@@ -16,7 +16,7 @@ int main(void) {
   struct timeval time = {};
   const struct input_event kPressA = {time, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
   EventDetector press_a = CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA);
-  if (StartEventDetector(press_a) != EVENT_DETECTOR_SUCCESS) {
+  if (StartEventDetector(press_a) != DETECTOR_SUCCESS) {
     DEBUG_LOG("Fail to init input device\n");
     exit(1);
   }
@@ -28,12 +28,12 @@ int main(void) {
   }
 
   while(1) {
-    if(CheckEvent(press_a) == EVENT_DETECTED)
+    if(CheckEvent(press_a) == DETECTOR_EVENT_DETECTED)
       ToggleLed(caps_led);
   }
 
   CleanupEventDetector(press_a);
-  DestroyKeyInputDevice(press_a);
+  DestroyKeyInputDetector(press_a);
 
   CleanupLedDriver(caps_led);
   DestroyLedDriver(caps_led);
