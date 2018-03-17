@@ -2,8 +2,8 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <gmock/gmock.h>
-#include <event_detector.h>
-#include <timeout_detector.h>
+#include <detector/event_detector.h>
+#include <detector/timeout_detector.h>
 #include <os/mock_time.h>
 
 MOCK_TIME *mock_time {};

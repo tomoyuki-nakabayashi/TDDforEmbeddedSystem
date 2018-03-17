@@ -42,8 +42,8 @@
 - [x] Create timer.
 - [x] Start timer.
 - [x] Detect timeout.
-- [ ] Detect wrapped timeout.
-- [ ] Oneshot.
+- [x] Detect wrapped timeout.
+- [x] Oneshot.
 - [ ] Repeatedly.
 
 ## Engine control command

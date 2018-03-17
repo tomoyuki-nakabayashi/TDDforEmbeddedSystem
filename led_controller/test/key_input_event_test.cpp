@@ -2,8 +2,8 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <gtest/gtest.h>
-#include <key_input_event.h>
-#include <event_detector.h>
+#include <detector/key_input_detector.h>
+#include <detector/event_detector.h>
 #include <fstream>
 #include <memory>
 #include <os/mock_io.h>

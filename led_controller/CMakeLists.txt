@@ -3,19 +3,19 @@ include_directories(src test/mocks)
 
 add_executable(led_controller
     src/main.c
-    src/event_detector.c
-    src/key_input_event.c
-    src/timeout_detector.c
+    src/detector/event_detector.c
+    src/detector/key_input_detector.c
+    src/detector/timeout_detector.c
     src/led_driver.c
     src/utils/logger.c
     src/os/io.c
     src/os/time.c)
 
 add_executable(unittests
-    src/key_input_event.c
+    src/detector/event_detector.c
+    src/detector/key_input_detector.c
+    src/detector/timeout_detector.c
     src/led_driver.c
-    src/event_detector.c
-    src/timeout_detector.c
     test/key_input_event_test.cpp
     test/timer_event_test.cpp
     test/led_driver_test.cpp
