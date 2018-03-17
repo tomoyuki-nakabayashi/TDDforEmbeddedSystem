@@ -26,7 +26,9 @@ static int StartTimeOutDetector(EventDetector super) {
   return EVENT_DETECTOR_SUCCESS;
 }
 
-static int IsTimedOut(uint32_t now, uint32_t start, uint32_t interval) {
+static int IsTimedOut(const uint32_t now,
+                      const uint32_t start,
+                      const uint32_t interval) {
   return (now - start >= interval);
 }
 
@@ -44,6 +46,10 @@ static int CheckTimeOut(EventDetector super) {
 }
 
 static int CleanupTimeOutDetector(EventDetector super) {
+  TimeOutDetector self = (TimeOutDetector)super;
+  self->start_time = 0;
+  self->timer_started = false;
+
   return EVENT_DETECTOR_SUCCESS;
 }
 

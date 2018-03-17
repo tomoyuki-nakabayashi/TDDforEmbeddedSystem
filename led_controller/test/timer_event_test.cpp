@@ -93,4 +93,16 @@ TEST_F(TimerEventTest, DetectWrappedTime) {
   EXPECT_EQ(EVENT_DETECTED, CheckEvent(detector_));
 }
 
+TEST_F(TimerEventTest, CleanupTimeOutDetector) {
+  StartEventDetector(detector_);
+  EXPECT_EQ(EVENT_DETECTOR_SUCCESS, CleanupEventDetector(detector_));
+  EXPECT_EQ(EVENT_DETECTOR_ERROR, CheckEvent(detector_));
+}
+
+TEST_F(TimerEventTest, NullPointerGuard) {
+  EXPECT_EQ(EVENT_DETECTOR_ERROR, StartEventDetector(nullptr));
+  EXPECT_EQ(EVENT_DETECTOR_ERROR, CheckEvent(nullptr));
+  EXPECT_EQ(EVENT_DETECTOR_ERROR, CleanupEventDetector(nullptr));
+}
+
 }  // namespace led_controller_test
