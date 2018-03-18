@@ -12,17 +12,16 @@
 
 #define KEYBOARD_DEVICE "/dev/input/event2"
 #define LED_DEVICE      "/sys/class/leds/input2::capslock/brightness"
+#define NUM_DETECTORS 2
 
 int main(void) {
-  struct timeval time = {};
-  const struct input_event kPressA = {time, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
-  EventDetector press_a = CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA);
-  if (StartEventDetector(press_a) != DETECTOR_SUCCESS) {
-    DEBUG_LOG("Fail to init input device\n");
-    exit(1);
-  }
+  struct timeval kTime = {};
+  const struct input_event kPressA = {kTime, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
 
-  EventDetector five_sec_timer = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
+  EventDetector detectors[NUM_DETECTORS+1];  // To null-terminate
+  detectors[0] = CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA);
+  detectors[1] = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
+  detectors[2] = NULL;  // null-terminate
   
   LedDriver caps_led = CreateLedDriver();
   if (InitLedDriver(caps_led, LED_DEVICE) != LED_DRIVER_SUCCESS) {
@@ -30,18 +29,17 @@ int main(void) {
     exit(1);
   }
 
-  while(CheckEvent(press_a) != DETECTOR_EVENT_DETECTED) {}
+  for(int i = 0; detectors[i] != NULL; i++) {
+    StartEventDetector(detectors[i]);
+    while(CheckEvent(detectors[i]) != DETECTOR_EVENT_DETECTED) {}
 
-  TurnOnLed(caps_led);
+    ToggleLed(caps_led);
+  }
 
-  StartEventDetector(five_sec_timer);
-  while(CheckEvent(five_sec_timer) != DETECTOR_EVENT_DETECTED) {}
-  TurnOffLed(caps_led);
-
-  CleanupEventDetector(press_a);
-  DestroyKeyInputDetector(press_a);
-  CleanupEventDetector(five_sec_timer);
-  DestroyKeyInputDetector(five_sec_timer);
+  for(int i = 0; detectors[i] != NULL; i++) {
+    CleanupEventDetector(detectors[i]);
+    DestroyKeyInputDetector(detectors[i]);
+  }
 
   CleanupLedDriver(caps_led);
   DestroyLedDriver(caps_led);
