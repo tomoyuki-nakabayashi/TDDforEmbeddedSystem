@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <os/mock_io.h>
-#include <led_driver.h>
+#include <drivers/led_driver.h>
 
 // Definition of mock_io is in mock_io.cpp
 
