@@ -35,7 +35,7 @@
 - [x] Turn on if LED is off.
 - [x] Turn off if LED is on.
 - [x] Toggle LED.
-- [ ] Extract Operate interface.
+- [ ] LED operation factory.
 
 ## Timer event
 
@@ -45,6 +45,14 @@
 - [x] Detect wrapped timeout.
 - [x] Oneshot.
 - [ ] Repeatedly.
+
+## Operator
+
+- [ ] Extract Operator interface.
+
+## Command
+
+- [ ] OperateOnDetection Command
 
 ## Engine control command
 
