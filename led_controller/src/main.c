@@ -7,7 +7,7 @@
 #include <detector/key_input_detector.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
-#include <led_driver.h>
+#include <drivers/led_driver.h>
 #include <utils/logger.h>
 
 #define KEYBOARD_DEVICE "/dev/input/event2"
