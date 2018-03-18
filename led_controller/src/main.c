@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <detector/key_input_detector.h>
 #include <detector/event_detector.h>
+#include <detector/timeout_detector.h>
 #include <led_driver.h>
 #include <utils/logger.h>
 
@@ -21,19 +22,26 @@ int main(void) {
     exit(1);
   }
 
+  EventDetector five_sec_timer = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
+  
   LedDriver caps_led = CreateLedDriver();
   if (InitLedDriver(caps_led, LED_DEVICE) != LED_DRIVER_SUCCESS) {
     DEBUG_LOG("Fail to init led device\n");
     exit(1);
   }
 
-  while(1) {
-    if(CheckEvent(press_a) == DETECTOR_EVENT_DETECTED)
-      ToggleLed(caps_led);
-  }
+  while(CheckEvent(press_a) != DETECTOR_EVENT_DETECTED) {}
+
+  TurnOnLed(caps_led);
+
+  StartEventDetector(five_sec_timer);
+  while(CheckEvent(five_sec_timer) != DETECTOR_EVENT_DETECTED) {}
+  TurnOffLed(caps_led);
 
   CleanupEventDetector(press_a);
   DestroyKeyInputDetector(press_a);
+  CleanupEventDetector(five_sec_timer);
+  DestroyKeyInputDetector(five_sec_timer);
 
   CleanupLedDriver(caps_led);
   DestroyLedDriver(caps_led);
