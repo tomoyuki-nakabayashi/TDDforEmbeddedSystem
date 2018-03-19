@@ -16,6 +16,8 @@ add_executable(unittests
     src/detector/key_input_detector.c
     src/detector/timeout_detector.c
     src/drivers/led_driver.c
+    src/operator/operator.c
+    src/operator/led_operator_factory.c
     test/key_input_event_test.cpp
     test/timer_event_test.cpp
     test/led_driver_test.cpp

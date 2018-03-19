@@ -8,6 +8,19 @@
 extern "C" {
 #endif
 
+typedef struct OperatorInterfaceStruct *OperatorInterface;
+typedef struct OperatorStruct *Operator;
+
+typedef struct OperatorStruct {
+  OperatorInterface vtable;
+} OperatorStruct;
+
+typedef struct OperatorInterfaceStruct {
+  void (*Operate)(Operator);
+} OperatorInterfaceStruct;
+
+void TriggerOperation(Operator op);
+
 #ifdef __cplusplus
 }
 #endif
