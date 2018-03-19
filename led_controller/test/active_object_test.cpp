@@ -2,6 +2,7 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <gmock/gmock.h>
+#include <command/operation_on_detection.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
 #include <operator/operator.h>
@@ -60,12 +61,13 @@ TEST_F(OperationOnDetectionTest, AbstractUse) {
   detector->vtable = &even_interface;
   Operator op = reinterpret_cast<Operator>(new CountOperator{});
   op->vtable = &count_interface;
-//  OperationOnDetection ood = CreateOperationOnDetection(detector, op);
+  Command ood = static_cast<Command>(CreateOperationOnDetection(detector, op));
 
-//  CommandExecute(oode);
-//  CommandExecute(oode);
+  CommandExecute(ood);
+  EXPECT_EQ(0, reinterpret_cast<CountOperator*>(op)->my_data);
 
-//  EXPECT_EQ(1, static_cast<CountOperator>(op).count);
+  CommandExecute(ood);
+  EXPECT_EQ(1, reinterpret_cast<CountOperator*>(op)->my_data);
 }
 
 }  // namespace led_controller_test

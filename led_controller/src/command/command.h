@@ -19,9 +19,7 @@ typedef struct CommandInterfaceStruct {
   void (*Execute)(Command);
 } CommandInterfaceStruct;
 
-void CommandExecute(Command cmd) {
-  cmd->vtable->Execute(cmd);
-}
+void CommandExecute(Command cmd);
 
 #ifdef __cplusplus
 }

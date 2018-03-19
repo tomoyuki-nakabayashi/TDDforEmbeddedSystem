@@ -6,7 +6,7 @@
 #include <command/command.h>
 
 namespace command_test {
-
+/* 
 typedef struct CounterCommand {
   CommandStruct command;
   int32_t my_data;
@@ -31,5 +31,5 @@ TEST_F(CommandTest, CounterCommandTest) {
   CommandExecute(reinterpret_cast<Command>(&cmd));
   EXPECT_EQ(1, cmd.my_data);
 }
-
+ */
 }  // namespace command_test
