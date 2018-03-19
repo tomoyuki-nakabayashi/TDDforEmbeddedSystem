@@ -6,6 +6,8 @@ add_executable(led_controller
     src/detector/event_detector.c
     src/detector/key_input_detector.c
     src/detector/timeout_detector.c
+    src/operator/operator.c
+    src/operator/led_operator_factory.c
     src/drivers/led_driver.c
     src/utils/logger.c
     src/os/io.c
