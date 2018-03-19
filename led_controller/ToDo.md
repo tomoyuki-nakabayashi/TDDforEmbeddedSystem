@@ -25,7 +25,6 @@
 - [x] Check null pointer check.
 - [x] evdev operation fails after cleanup().
 - [x] Extract Detect interface.
-- [ ] input event factory.
 
 ## LED Brightness
 
@@ -35,7 +34,7 @@
 - [x] Turn on if LED is off.
 - [x] Turn off if LED is on.
 - [x] Toggle LED.
-- [ ] LED operation factory.
+- [x] LED operation factory.
 
 ## Timer event
 
@@ -46,9 +45,13 @@
 - [x] Oneshot.
 - [ ] Repeatedly.
 
+## Detector
+
+- [ ] Has Destroy interface.
+
 ## Operator
 
-- [ ] Extract Operator interface.
+- [x] Extract Operator interface.
 
 ## Command
 
