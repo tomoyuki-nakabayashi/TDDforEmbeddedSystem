@@ -55,7 +55,7 @@
 
 ## Command
 
-- [ ] OperateOnDetection Command
+- [ ] ActionOnTrigger Command
 
 ## Engine control command
 

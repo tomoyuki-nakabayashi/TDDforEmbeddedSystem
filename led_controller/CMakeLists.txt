@@ -21,7 +21,7 @@ add_executable(unittests
     src/operator/operator.c
     src/operator/led_operator_factory.c
     src/command/command.c
-    src/command/operation_on_detection.c
+    src/command/action_on_trigger.c
     test/active_object_test.cpp
     test/key_input_event_test.cpp
     test/timer_event_test.cpp

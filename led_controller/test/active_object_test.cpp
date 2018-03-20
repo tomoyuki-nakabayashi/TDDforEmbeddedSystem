@@ -2,14 +2,14 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <gmock/gmock.h>
-#include <command/operation_on_detection.h>
+#include <command/action_on_trigger.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
 #include <operator/operator.h>
 
 namespace led_controller_test {
 
-class OperationOnDetectionTest : public ::testing::Test {
+class ActionOnTriggerTest : public ::testing::Test {
  protected:
     void SetUp() override {
     }
@@ -56,12 +56,12 @@ static OperatorInterfaceStruct count_interface = {
   IncrementCounter
 };
 
-TEST_F(OperationOnDetectionTest, AbstractUse) {
+TEST_F(ActionOnTriggerTest, AbstractUse) {
   EventDetector detector = reinterpret_cast<EventDetector>(new EvenDetector{});
   detector->vtable = &even_interface;
   Operator op = reinterpret_cast<Operator>(new CountOperator{});
   op->vtable = &count_interface;
-  Command ood = static_cast<Command>(CreateOperationOnDetection(detector, op));
+  Command ood = static_cast<Command>(CreateActionOnTrigger(detector, op));
 
   CommandExecute(ood);
   EXPECT_EQ(0, reinterpret_cast<CountOperator*>(op)->my_data);
