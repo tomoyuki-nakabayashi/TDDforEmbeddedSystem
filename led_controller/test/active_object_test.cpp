@@ -146,7 +146,34 @@ TEST_F(ActionOnTriggerTest, ChainHasTwoCommands) {
     CommandExecute(chained_cmd);
 
   EXPECT_EQ(2, reinterpret_cast<CountOperator*>(op_.get())->my_data);
-  EXPECT_EQ(0, reinterpret_cast<CountOperator*>(detector_.get())->my_data);
+  EXPECT_EQ(0, reinterpret_cast<EvenCountDetector*>(detector_.get())->my_data);
 }
+
+class ActiveObjectEngineTest : public ::testing::Test {
+ protected:
+    ActiveObjectEngineTest()
+        : detector_{CreateEvenCountDetector()}
+        , op_{CreateIncrementCounter()}
+        , count_even_{CreateTriggerActionPair(detector_.get(), op_.get())} {
+    }
+
+    void SetUp() override {
+      actions_ = new TriggerActionPair[3];
+      actions_[0] = count_even_;
+      actions_[1] = count_even_;
+      actions_[2] = nullptr;
+    }
+
+    void TearDown() override {
+      delete[] actions_;
+      DestroyTriggerActionPair(count_even_);
+    }
+
+ protected:
+    std::unique_ptr<EventDetectorStruct> detector_;
+    std::unique_ptr<OperatorStruct> op_;
+    TriggerActionPair count_even_;
+    TriggerActionPair *actions_;
+};
 
 }  // namespace led_controller_test

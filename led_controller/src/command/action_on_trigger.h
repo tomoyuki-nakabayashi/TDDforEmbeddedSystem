@@ -16,6 +16,7 @@ struct TriggerActionPairStruct;
 typedef struct TriggerActionPairStruct *TriggerActionPair;
 
 TriggerActionPair CreateTriggerActionPair(EventDetector detector, Operator op);
+void DestroyTriggerActionPair(TriggerActionPair trigger_action);
 Command CreateActionOnTriggerChain(TriggerActionPair *chain);
 
 #ifdef __cplusplus

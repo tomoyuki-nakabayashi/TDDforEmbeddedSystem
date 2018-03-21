@@ -40,6 +40,17 @@ static CommandInterfaceStruct interface = {
   .Execute = ExecuteActionOnTrigger
 };
 
+TriggerActionPair CreateTriggerActionPair(EventDetector detector, Operator op) {
+  TriggerActionPair pair = calloc(1, sizeof(TriggerActionPairStruct));
+  pair->detector = detector;
+  pair->op = op;
+  return pair;
+}
+
+void DestroyTriggerActionPair(TriggerActionPair trigger_action) {
+  free(trigger_action);
+}
+
 // Should give ActiveObjectEngine.
 Command CreateActionOnTriggerChain(TriggerActionPair *chain) {
   ActionOnTriggerChain aot_chain = calloc(1, sizeof(ActionOnTriggerChainStruct));
@@ -49,11 +60,4 @@ Command CreateActionOnTriggerChain(TriggerActionPair *chain) {
   aot_chain->index_started = false;
 
   return (Command)aot_chain;
-}
-
-TriggerActionPair CreateTriggerActionPair(EventDetector detector, Operator op) {
-  TriggerActionPair pair = calloc(1, sizeof(TriggerActionPairStruct));
-  pair->detector = detector;
-  pair->op = op;
-  return pair;
 }
