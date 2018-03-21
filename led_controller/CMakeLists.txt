@@ -31,5 +31,5 @@ add_executable(unittests
     test/mocks/os/mock_io.cpp
     test/mocks/utils/logger_spy.c)
 
-target_link_libraries(led_controller ${LIBEVDEV_LIBRARIES})
-target_link_libraries(unittests gmock_main)
+target_link_libraries(led_controller ${LIBEVDEV_LIBRARIES} ${LIBEVDEV_LIBRARIES})
+target_link_libraries(unittests gmock_main ${GLIB_LIBRARIES})

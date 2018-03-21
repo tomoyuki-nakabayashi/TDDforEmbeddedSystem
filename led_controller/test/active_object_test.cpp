@@ -2,23 +2,13 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <gmock/gmock.h>
+#include <memory>
 #include <command/action_on_trigger.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
 #include <operator/operator.h>
 
 namespace led_controller_test {
-
-class ActionOnTriggerTest : public ::testing::Test {
- protected:
-    void SetUp() override {
-    }
-
-    void TearDown() override {
-    }
-
- protected:
-};
 
 typedef struct EvenCountDetector {
   EventDetectorStruct base;
@@ -67,6 +57,26 @@ static Operator CreateIncrementCounter() {
   op->base.vtable = &count_interface;
   return reinterpret_cast<Operator>(op);
 }
+
+class ActionOnTriggerTest : public ::testing::Test {
+ protected:
+    ActionOnTriggerTest()
+        : detector_{CreateEvenCountDetector()}
+        , op_{CreateIncrementCounter()} {
+    }
+
+    void SetUp() override {
+
+    }
+
+    void TearDown() override {
+    }
+
+ protected:
+    std::unique_ptr<EventDetectorStruct> detector_;
+    std::unique_ptr<OperatorStruct> op_;
+};
+
 /* 
 TEST_F(TriggerActionMapTest, AbstractUse) {
   GArray action_trigger_array;
@@ -93,17 +103,27 @@ TEST_F(TriggerActionMapTest, AbstractUse) {
 }
  */
 
-TEST_F(ActionOnTriggerTest, ActionOnTriggerPieceOfChains) {
-  auto detector = CreateEvenCountDetector();
-  auto op = CreateIncrementCounter();
-
-  auto count_even_value = CreateTriggerActionPair(detector, op);
-
+TEST_F(ActionOnTriggerTest, ActionOnTriggerPieceOfChain) {
+  auto count_even_value = CreateTriggerActionPair(detector_.get(), op_.get());
   auto chained_cmd = CreateActionOnTriggerChain(&count_even_value);
   CommandExecute(chained_cmd);
   CommandExecute(chained_cmd);
 
-  EXPECT_EQ(1, reinterpret_cast<CountOperator*>(op)->my_data);
+  EXPECT_EQ(1, reinterpret_cast<CountOperator*>(op_.get())->my_data);
+}
+
+TEST_F(ActionOnTriggerTest, ChainReachesNull) {
+  auto count_even_value = CreateTriggerActionPair(detector_.get(), op_.get());
+  TriggerActionPair *array = new TriggerActionPair[2];
+  array[0] = count_even_value;
+  array[1] = nullptr;
+  auto chained_cmd = CreateActionOnTriggerChain(array);
+  CommandExecute(chained_cmd);
+  CommandExecute(chained_cmd);
+  CommandExecute(chained_cmd);
+  CommandExecute(chained_cmd);
+
+  EXPECT_EQ(1, reinterpret_cast<CountOperator*>(op_.get())->my_data);
 }
 
 }  // namespace led_controller_test
