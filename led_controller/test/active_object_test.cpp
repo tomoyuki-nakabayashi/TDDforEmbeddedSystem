@@ -118,12 +118,35 @@ TEST_F(ActionOnTriggerTest, ChainReachesNull) {
   array[0] = count_even_value;
   array[1] = nullptr;
   auto chained_cmd = CreateActionOnTriggerChain(array);
-  CommandExecute(chained_cmd);
-  CommandExecute(chained_cmd);
+  for (auto i = 0; i < 4; ++i)
+    CommandExecute(chained_cmd);
+
+  EXPECT_EQ(1, reinterpret_cast<CountOperator*>(op_.get())->my_data);
+}
+
+TEST_F(ActionOnTriggerTest, ChainMustNullTerminate) {
+  auto count_even_value = CreateTriggerActionPair(detector_.get(), op_.get());
+  TriggerActionPair *array = new TriggerActionPair[1];
+  array[0] = count_even_value;
+  auto chained_cmd = CreateActionOnTriggerChain(array);
+
   CommandExecute(chained_cmd);
   CommandExecute(chained_cmd);
 
-  EXPECT_EQ(1, reinterpret_cast<CountOperator*>(op_.get())->my_data);
+  EXPECT_DEATH(CommandExecute(chained_cmd), "");
+}
+
+TEST_F(ActionOnTriggerTest, ChainHasTwoCommands) {
+  auto count_even_value = CreateTriggerActionPair(detector_.get(), op_.get());
+  TriggerActionPair *array = new TriggerActionPair[2];
+  array[0] = count_even_value;
+  array[1] = count_even_value;
+  auto chained_cmd = CreateActionOnTriggerChain(array);
+  for (auto i = 0; i < 4; ++i)
+    CommandExecute(chained_cmd);
+
+  EXPECT_EQ(2, reinterpret_cast<CountOperator*>(op_.get())->my_data);
+  EXPECT_EQ(0, reinterpret_cast<CountOperator*>(detector_.get())->my_data);
 }
 
 }  // namespace led_controller_test

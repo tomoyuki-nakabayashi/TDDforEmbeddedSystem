@@ -14,17 +14,25 @@ typedef struct ActionOnTriggerChainStruct {
   CommandStruct base;
   TriggerActionPair *chain;  // null terminated.
   int32_t index;
+  bool index_started;
 } ActionOnTriggerChainStruct;
 typedef struct ActionOnTriggerChainStruct *ActionOnTriggerChain;
 
 static void ExecuteActionOnTrigger(Command super) {
   ActionOnTriggerChain self = (ActionOnTriggerChain)super;
   const int32_t index = self->index;
-  if(self->chain[index] == NULL) return;
+  if (self->chain[index] == NULL) return;
 
-  if(CheckEvent(self->chain[index]->detector) == DETECTOR_EVENT_DETECTED) {
+  if (!self->index_started) {
+    StartEventDetector(self->chain[index]->detector);
+    self->index_started = true;
+  }
+
+  if (CheckEvent(self->chain[index]->detector) == DETECTOR_EVENT_DETECTED) {
     TriggerOperation(self->chain[index]->op);
+    CleanupEventDetector(self->chain[index]->detector);
     self->index++;
+    self->index_started = false;
   }
 }
 
@@ -38,6 +46,7 @@ Command CreateActionOnTriggerChain(TriggerActionPair *chain) {
   aot_chain->base.vtable = &interface;
   aot_chain->chain = chain;
   aot_chain->index = 0;
+  aot_chain->index_started = false;
 
   return (Command)aot_chain;
 }
