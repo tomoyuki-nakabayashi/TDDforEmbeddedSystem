@@ -55,7 +55,7 @@
 
 ## Command
 
-- [ ] ActionOnTrigger Command
+- [ ] TriggerActionMap Command
 
 ## Engine control command
 

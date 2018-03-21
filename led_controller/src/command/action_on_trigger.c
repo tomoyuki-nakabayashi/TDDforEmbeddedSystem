@@ -4,27 +4,38 @@
 #include <command/action_on_trigger.h>
 #include <stdlib.h>
 
-typedef struct ActionOnTriggerCommandStruct {
+typedef struct TriggerActionPairStruct {
+  EventDetector detector;
+  Operator op;
+} TriggerActionPairStruct;
+
+typedef struct ActionOnTriggerChainStruct {
   CommandStruct base;
-  ActionOnTrigger aot;
-  ActionOnTrigger next;
-} ActionOnTriggerCommandStruct;
-typedef struct ActionOnTriggerCommandStruct *ActionOnTriggerCommand;
+  TriggerActionPair *chain;
+} ActionOnTriggerChainStruct;
+typedef struct ActionOnTriggerChainStruct *ActionOnTriggerChain;
 
 static void ExecuteActionOnTrigger(Command super) {
-  ActionOnTriggerCommand self = (ActionOnTriggerCommand)super;
-  if(CheckEvent(self->aot->detector) == DETECTOR_EVENT_DETECTED)
-    TriggerOperation(self->aot->op);
+  ActionOnTriggerChain self = (ActionOnTriggerChain)super;
+  if(CheckEvent(self->chain[0]->detector) == DETECTOR_EVENT_DETECTED)
+    TriggerOperation(self->chain[0]->op);
 }
 
 static CommandInterfaceStruct interface = {
   .Execute = ExecuteActionOnTrigger
 };
 
-Command CreateActionOnTrigger(EventDetector detector, Operator op) {
-  ActionOnTriggerCommand self = calloc(1, sizeof(ActionOnTriggerCommandStruct));
-  self->base.vtable = &interface;
-  self->aot->detector = detector;
-  self->aot->op = op;
-  return (Command)self;
+Command CreateActionOnTriggerChain(TriggerActionPair *chain) {
+  ActionOnTriggerChain aot_chain = calloc(1, sizeof(ActionOnTriggerChainStruct));
+  aot_chain->base.vtable = &interface;
+  aot_chain->chain = chain;
+
+  return (Command)aot_chain;
+}
+
+TriggerActionPair CreateTriggerActionPair(EventDetector detector, Operator op) {
+  TriggerActionPair pair = calloc(1, sizeof(TriggerActionPairStruct));
+  pair->detector = detector;
+  pair->op = op;
+  return pair;
 }

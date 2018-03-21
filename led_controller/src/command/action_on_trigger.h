@@ -12,13 +12,11 @@ extern "C" {
 #include <detector/event_detector.h>
 #include <operator/operator.h>
 
-typedef struct ActionOnTriggerStruct {
-  EventDetector detector;
-  Operator op;
-} ActionOnTriggerStruct;
-typedef struct ActionOnTriggerStruct *ActionOnTrigger;
+struct TriggerActionPairStruct;
+typedef struct TriggerActionPairStruct *TriggerActionPair;
 
-Command CreateActionOnTrigger(EventDetector detector, Operator op);
+TriggerActionPair CreateTriggerActionPair(EventDetector detector, Operator op);
+Command CreateActionOnTriggerChain(TriggerActionPair *chain);
 
 #ifdef __cplusplus
 }
