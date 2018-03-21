@@ -3,6 +3,7 @@
 
 #include <gmock/gmock.h>
 #include <memory>
+#include <command/command.h>
 #include <command/action_on_trigger.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
@@ -149,6 +150,25 @@ TEST_F(ActionOnTriggerTest, ChainHasTwoCommands) {
   EXPECT_EQ(0, reinterpret_cast<EvenCountDetector*>(detector_.get())->my_data);
 }
 
+static int32_t total_counter = 0;
+typedef struct TotalCountCommand {
+  CommandStruct base;
+} TotalCountCommand;
+
+static void IncrementTotalCounter(Command /*super*/) {
+  total_counter++;
+}
+
+static CommandInterfaceStruct total_counter_interface = {
+  IncrementTotalCounter
+};
+
+static Command CreateTotalCount() {
+  auto cmd = new TotalCountCommand{};
+  cmd->base.vtable = &total_counter_interface;
+  return reinterpret_cast<Command>(cmd);
+}
+
 class ActiveObjectEngineTest : public ::testing::Test {
  protected:
     ActiveObjectEngineTest()
@@ -158,6 +178,7 @@ class ActiveObjectEngineTest : public ::testing::Test {
     }
 
     void SetUp() override {
+      total_counter = 0;
       actions_ = new TriggerActionPair[3];
       actions_[0] = count_even_;
       actions_[1] = count_even_;
@@ -175,5 +196,22 @@ class ActiveObjectEngineTest : public ::testing::Test {
     TriggerActionPair count_even_;
     TriggerActionPair *actions_;
 };
+/* 
+TEST_F(ActiveObjectEngineTest, AbstractUse) {
+  auto engine = CreateActiveObjectEngine();
+  auto cmd = CreateActionOnTriggerChain(actions_);
+  FuelEngine(engine, cmd);
+  EngineRuns(engine);
+}
+ */
+
+TEST_F(ActiveObjectEngineTest, SimpleCommandTest) {
+  auto engine = CreateActiveObjectEngine();
+  auto cmd = CreateTotalCount();
+  FuelEngine(engine, cmd);
+  EngineRuns(engine);
+
+  EXPECT_EQ(1, total_counter;);
+}
 
 }  // namespace led_controller_test
