@@ -107,11 +107,14 @@ TEST_F(TriggerActionMapTest, AbstractUse) {
 
 TEST_F(ActionOnTriggerTest, ActionOnTriggerPieceOfChain) {
   auto count_even_value = CreateTriggerActionPair(detector_.get(), op_.get());
-  auto chained_cmd = CreateActionOnTriggerChain(&count_even_value);
+  auto chained_cmd = CreateActionOnTriggerChain(&count_even_value, nullptr);
   CommandExecute(chained_cmd);
   CommandExecute(chained_cmd);
 
   EXPECT_EQ(1, reinterpret_cast<CountOperator*>(op_.get())->my_data);
+
+  DestroyTriggerActionPair(count_even_value);
+  DestroyActionOnTriggerChain(chained_cmd);
 }
 
 TEST_F(ActionOnTriggerTest, ChainReachesNull) {
@@ -119,23 +122,29 @@ TEST_F(ActionOnTriggerTest, ChainReachesNull) {
   TriggerActionPair *array = new TriggerActionPair[2];
   array[0] = count_even_value;
   array[1] = nullptr;
-  auto chained_cmd = CreateActionOnTriggerChain(array);
+  auto chained_cmd = CreateActionOnTriggerChain(array, nullptr);
   for (auto i = 0; i < 4; ++i)
     CommandExecute(chained_cmd);
 
   EXPECT_EQ(1, reinterpret_cast<CountOperator*>(op_.get())->my_data);
+
+  DestroyTriggerActionPair(count_even_value);
+  DestroyActionOnTriggerChain(chained_cmd);
 }
 
 TEST_F(ActionOnTriggerTest, ChainMustNullTerminate) {
   auto count_even_value = CreateTriggerActionPair(detector_.get(), op_.get());
   TriggerActionPair *array = new TriggerActionPair[1];
   array[0] = count_even_value;
-  auto chained_cmd = CreateActionOnTriggerChain(array);
+  auto chained_cmd = CreateActionOnTriggerChain(array, nullptr);
 
   CommandExecute(chained_cmd);
   CommandExecute(chained_cmd);
 
   EXPECT_DEATH(CommandExecute(chained_cmd), "");
+
+  DestroyTriggerActionPair(count_even_value);
+  DestroyActionOnTriggerChain(chained_cmd);
 }
 
 TEST_F(ActionOnTriggerTest, ChainHasTwoCommands) {
@@ -143,12 +152,15 @@ TEST_F(ActionOnTriggerTest, ChainHasTwoCommands) {
   TriggerActionPair *array = new TriggerActionPair[2];
   array[0] = count_even_value;
   array[1] = count_even_value;
-  auto chained_cmd = CreateActionOnTriggerChain(array);
+  auto chained_cmd = CreateActionOnTriggerChain(array, nullptr);
   for (auto i = 0; i < 4; ++i)
     CommandExecute(chained_cmd);
 
   EXPECT_EQ(2, reinterpret_cast<CountOperator*>(op_.get())->my_data);
   EXPECT_EQ(0, reinterpret_cast<EvenCountDetector*>(detector_.get())->my_data);
+
+  DestroyTriggerActionPair(count_even_value);
+  DestroyActionOnTriggerChain(chained_cmd);
 }
 
 typedef struct TotalCountCommand {
@@ -227,6 +239,15 @@ TEST_F(ActiveObjectEngineTest, MultipleCommandsTest) {
 
   EXPECT_EQ(3, reinterpret_cast<TotalCountCommand*>(cmd)->total_counter);
   DestroyActiveObjectEngine(engine);
+}
+
+TEST_F(ActiveObjectEngineTest, FuelActionOnTrigger) {
+  auto engine = CreateActiveObjectEngine();
+  auto cmd = CreateActionOnTriggerChain(actions_, engine);
+  FuelEngine(engine, cmd);
+  EngineRuns(engine);
+
+  EXPECT_EQ(2, reinterpret_cast<CountOperator*>(op_.get())->my_data);
 }
 
 }  // namespace led_controller_test

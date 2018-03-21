@@ -12,7 +12,8 @@ typedef struct TriggerActionPairStruct {
 
 typedef struct ActionOnTriggerChainStruct {
   CommandStruct base;
-  TriggerActionPair *chain;  // null terminated.
+  TriggerActionPair *chain;
+  ActiveObjectEngine engine;
   int32_t index;
   bool index_started;
 } ActionOnTriggerChainStruct;
@@ -34,6 +35,8 @@ static void ExecuteActionOnTrigger(Command super) {
     self->index++;
     self->index_started = false;
   }
+
+  FuelEngine(self->engine, (Command)self);
 }
 
 static CommandInterfaceStruct interface = {
@@ -52,12 +55,18 @@ void DestroyTriggerActionPair(TriggerActionPair trigger_action) {
 }
 
 // Should give ActiveObjectEngine.
-Command CreateActionOnTriggerChain(TriggerActionPair *chain) {
+Command CreateActionOnTriggerChain(TriggerActionPair *chain,
+                                   ActiveObjectEngine engine) {
   ActionOnTriggerChain aot_chain = calloc(1, sizeof(ActionOnTriggerChainStruct));
   aot_chain->base.vtable = &interface;
   aot_chain->chain = chain;
+  aot_chain->engine = engine;
   aot_chain->index = 0;
   aot_chain->index_started = false;
 
   return (Command)aot_chain;
+}
+
+void DestroyActionOnTriggerChain(Command super) {
+  free(super);
 }

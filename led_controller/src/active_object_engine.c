@@ -23,6 +23,7 @@ void DestroyActiveObjectEngine(ActiveObjectEngine engine) {
 }
 
 void FuelEngine(ActiveObjectEngine engine, Command cmd) {
+  if ((engine == NULL) || (cmd == NULL)) return;
   engine->commands = g_slist_append(engine->commands, (gpointer)cmd);
 }
 

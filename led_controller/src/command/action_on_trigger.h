@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 #include <command/command.h>
+#include <active_object_engine.h>
 #include <detector/event_detector.h>
 #include <operator/operator.h>
 
@@ -17,7 +18,10 @@ typedef struct TriggerActionPairStruct *TriggerActionPair;
 
 TriggerActionPair CreateTriggerActionPair(EventDetector detector, Operator op);
 void DestroyTriggerActionPair(TriggerActionPair trigger_action);
-Command CreateActionOnTriggerChain(TriggerActionPair *chain);
+// chain must be null terminated.
+Command CreateActionOnTriggerChain(TriggerActionPair *chain,
+                                   ActiveObjectEngine engine);
+void DestroyActionOnTriggerChain(Command super);
 
 #ifdef __cplusplus
 }
