@@ -20,19 +20,19 @@ class ActionOnTriggerTest : public ::testing::Test {
  protected:
 };
 
-typedef struct EvenDetector {
+typedef struct EvenCountDetector {
   EventDetectorStruct base;
   uint32_t my_data;
-} EvenDetector;
+} EvenCountDetector;
 
 static int ClearEvenCounter(EventDetector super) {
-  auto self = reinterpret_cast<EvenDetector*>(super);
+  auto self = reinterpret_cast<EvenCountDetector*>(super);
   self->my_data = 0;
   return DETECTOR_SUCCESS;
 }
 
 static int CheckEvenCounter(EventDetector super) {
-  auto self = reinterpret_cast<EvenDetector*>(super);
+  auto self = reinterpret_cast<EvenCountDetector*>(super);
   self->my_data++;
   return ((self->my_data % 2) == 0) ?
     DETECTOR_EVENT_DETECTED : DETECTOR_EVENT_NOT_DETECTED;
@@ -41,6 +41,12 @@ static int CheckEvenCounter(EventDetector super) {
 static EventDetectorInterfaceStruct even_interface = {
   ClearEvenCounter, CheckEvenCounter, ClearEvenCounter,
 };
+
+static EventDetector CreateEvenCountDetector() {
+  auto detector = new EvenCountDetector{};
+  detector->base.vtable = &even_interface;
+  return reinterpret_cast<EventDetector>(detector);
+}
 
 typedef struct CountOperator {
   OperatorStruct base;
@@ -55,11 +61,17 @@ static void IncrementCounter(Operator super) {
 static OperatorInterfaceStruct count_interface = {
   IncrementCounter
 };
+
+static Operator CreateIncrementCounter() {
+  auto op = new CountOperator{};
+  op->base.vtable = &count_interface;
+  return reinterpret_cast<Operator>(op);
+}
 /* 
 TEST_F(TriggerActionMapTest, AbstractUse) {
   GArray action_trigger_array;
 
-  auto detector = reinterpret_cast<EventDetector>(new EvenDetector{});
+  auto detector = reinterpret_cast<EventDetector>(new EvenCountDetector{});
   detector->vtable = &even_interface;
   auto op = reinterpret_cast<Operator>(new CountOperator{});
   op->vtable = &count_interface;
@@ -82,10 +94,8 @@ TEST_F(TriggerActionMapTest, AbstractUse) {
  */
 
 TEST_F(ActionOnTriggerTest, ActionOnTriggerPieceOfChains) {
-  auto detector = reinterpret_cast<EventDetector>(new EvenDetector{});
-  detector->vtable = &even_interface;
-  auto op = reinterpret_cast<Operator>(new CountOperator{});
-  op->vtable = &count_interface;
+  auto detector = CreateEvenCountDetector();
+  auto op = CreateIncrementCounter();
 
   auto count_even_value = CreateTriggerActionPair(detector, op);
 
