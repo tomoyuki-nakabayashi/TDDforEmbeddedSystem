@@ -23,13 +23,13 @@ int main(void) {
   struct timeval kTime = {};
   const struct input_event kPressA = {kTime, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
 
-  TriggerActionPair actions[NUM_OPERATION_ON_DETECTION+1];
   LedDriver caps_led = CreateLedDriver();
   if (InitLedDriver(caps_led, LED_DEVICE) != LED_DRIVER_SUCCESS) {
     DEBUG_LOG("Fail to init led device\n");
     exit(1);
   }
 
+  TriggerActionPair actions[NUM_OPERATION_ON_DETECTION+1];
   // "A" press triggers CAPS LED turn on.
   actions[0] = CreateTriggerActionPair(
                   CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA),
