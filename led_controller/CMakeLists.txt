@@ -14,6 +14,7 @@ add_executable(led_controller
     src/os/time.c)
 
 add_executable(unittests
+    src/active_object_engine.c
     src/detector/event_detector.c
     src/detector/key_input_detector.c
     src/detector/timeout_detector.c
