@@ -2,7 +2,7 @@
 
 ## Environment
 
-- [ ] Link glib to use variable length array.
+- [x] Link glib to use variable length array.
 
 ## LED Controller
 
@@ -55,7 +55,7 @@
 
 ## Command
 
-- [ ] TriggerActionMap Command
+- [x] TriggerActionMap Command
 
 ## Engine control command
 

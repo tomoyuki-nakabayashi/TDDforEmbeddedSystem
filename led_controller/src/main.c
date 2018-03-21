@@ -4,6 +4,9 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <active_object_engine.h>
+#include <command/command.h>
+#include <command/action_on_trigger.h>
 #include <detector/key_input_detector.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
@@ -20,33 +23,30 @@ int main(void) {
   struct timeval kTime = {};
   const struct input_event kPressA = {kTime, EV_KEY, KEY_A, INPUT_KEY_PRESSED};
 
-  EventDetector detectors[NUM_OPERATION_ON_DETECTION];
-  detectors[0] = CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA);
-  detectors[1] = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
-  
+  TriggerActionPair actions[NUM_OPERATION_ON_DETECTION+1];
   LedDriver caps_led = CreateLedDriver();
   if (InitLedDriver(caps_led, LED_DEVICE) != LED_DRIVER_SUCCESS) {
     DEBUG_LOG("Fail to init led device\n");
     exit(1);
   }
 
-  Operator operators[NUM_OPERATION_ON_DETECTION];
-  operators[0] = LedOperatorFactory(caps_led, OP_LED_TURN_ON);
-  operators[1] = LedOperatorFactory(caps_led, OP_LED_TURN_OFF);
+  // "A" press triggers CAPS LED turn on.
+  actions[0] = CreateTriggerActionPair(
+                  CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA),
+                  LedOperatorFactory(caps_led, OP_LED_TURN_ON));
+  // 5 sec timeout triggers CAPS LED turn off.
+  actions[1] = CreateTriggerActionPair(
+                  CreateTimeOutDetector(5000, TIMER_ONE_SHOT),
+                  LedOperatorFactory(caps_led, OP_LED_TURN_OFF));
+  actions[2] = NULL;  // null-termination.
 
-  for(int i = 0; i < NUM_OPERATION_ON_DETECTION; i++) {
-    StartEventDetector(detectors[i]);
-    while(CheckEvent(detectors[i]) != DETECTOR_EVENT_DETECTED) {}
+  ActiveObjectEngine engine = CreateActiveObjectEngine();
+  Command cmd = CreateActionOnTriggerChain(actions, engine);
+  FuelEngine(engine, cmd);
 
-    TriggerOperation(operators[i]);
-  }
+  EngineRuns(engine);
 
-  for(int i = 0; i < NUM_OPERATION_ON_DETECTION; i++) {
-    CleanupEventDetector(detectors[i]);
-  }
-
-  DestroyKeyInputDetector(detectors[0]);
-  DestroyTimeOutDetector(detectors[1]);
+  // Need cleanup.
   CleanupLedDriver(caps_led);
   DestroyLedDriver(caps_led);
 

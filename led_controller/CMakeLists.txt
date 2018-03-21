@@ -3,6 +3,9 @@ include_directories(src test/mocks)
 
 add_executable(led_controller
     src/main.c
+    src/active_object_engine.c
+    src/command/command.c
+    src/command/action_on_trigger.c
     src/detector/event_detector.c
     src/detector/key_input_detector.c
     src/detector/timeout_detector.c
@@ -32,5 +35,5 @@ add_executable(unittests
     test/mocks/os/mock_io.cpp
     test/mocks/utils/logger_spy.c)
 
-target_link_libraries(led_controller ${LIBEVDEV_LIBRARIES} ${LIBEVDEV_LIBRARIES})
+target_link_libraries(led_controller ${LIBEVDEV_LIBRARIES} ${GLIB_LIBRARIES})
 target_link_libraries(unittests gmock_main ${GLIB_LIBRARIES})
