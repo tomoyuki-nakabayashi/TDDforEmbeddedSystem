@@ -207,13 +207,25 @@ TEST_F(ActiveObjectEngineTest, AbstractUse) {
 }
  */
 
-TEST_F(ActiveObjectEngineTest, SimpleCommandTest) {
+TEST_F(ActiveObjectEngineTest, OneCommandTest) {
   auto engine = CreateActiveObjectEngine();
   auto cmd = CreateTotalCount();
   FuelEngine(engine, cmd);
   EngineRuns(engine);
 
   EXPECT_EQ(1, reinterpret_cast<TotalCountCommand*>(cmd)->total_counter);
+  DestroyActiveObjectEngine(engine);
+}
+
+TEST_F(ActiveObjectEngineTest, MultipleCommandsTest) {
+  auto engine = CreateActiveObjectEngine();
+  auto cmd = CreateTotalCount();
+  FuelEngine(engine, cmd);
+  FuelEngine(engine, cmd);
+  FuelEngine(engine, cmd);
+  EngineRuns(engine);
+
+  EXPECT_EQ(3, reinterpret_cast<TotalCountCommand*>(cmd)->total_counter);
   DestroyActiveObjectEngine(engine);
 }
 
