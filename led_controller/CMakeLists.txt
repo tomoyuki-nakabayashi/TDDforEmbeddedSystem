@@ -15,6 +15,20 @@ add_executable(led_controller
     src/os/io.c
     src/os/time.c)
 
+    add_executable(three_times_in_two_sec
+    src/three_times_in_two_sec.c
+    src/active_object_engine.c
+    src/command/command.c
+    src/command/count_total.c
+    src/command/halt_engine.c
+    src/command/action_on_trigger.c
+    src/detector/event_detector.c
+    src/detector/key_input_detector.c
+    src/detector/timeout_detector.c
+    src/utils/logger.c
+    src/os/io.c
+    src/os/time.c)
+
 add_executable(unittests
     src/active_object_engine.c
     src/detector/event_detector.c
@@ -35,4 +49,5 @@ add_executable(unittests
     test/mocks/utils/logger_spy.c)
 
 target_link_libraries(led_controller ${LIBEVDEV_LIBRARIES} ${GLIB_LIBRARIES})
+target_link_libraries(three_times_in_two_sec ${LIBEVDEV_LIBRARIES} ${GLIB_LIBRARIES})
 target_link_libraries(unittests gmock_main ${GLIB_LIBRARIES})

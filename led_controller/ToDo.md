@@ -52,12 +52,13 @@
 ## Operator
 
 - [x] Extract Operator interface.
-- [ ] Integrate to Command.
+- [x] Integrate to Command.
 
 ## Command
 
 - [x] TriggerActionMap Command
+- [ ] ActionOnTrigger continues infinitly.
 
 ## Engine control command
 
-- [ ] Implement flush by overriding Operate interface.
+- [x] Implement flush by overriding Command interface.
