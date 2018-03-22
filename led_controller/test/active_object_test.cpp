@@ -5,6 +5,7 @@
 #include <memory>
 #include <active_object_engine.h>
 #include <command/command.h>
+#include <command/halt_engine.h>
 #include <command/action_on_trigger.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
@@ -144,6 +145,19 @@ TEST_F(ActiveObjectEngineTest, FuelActionOnTrigger) {
   EngineRuns(engine);
 
   EXPECT_EQ(2, reinterpret_cast<CountCommand*>(op_.get())->my_data);
+}
+
+TEST_F(ActiveObjectEngineTest, HaltEngine) {
+  auto engine = CreateActiveObjectEngine();
+  auto cmd = CreateTotalCount();
+  auto halt = CreateHaltEngine(engine);
+
+  FuelEngine(engine, cmd);
+  FuelEngine(engine, halt);
+  FuelEngine(engine, cmd);
+  EngineRuns(engine);
+
+  EXPECT_EQ(1, reinterpret_cast<TotalCountCommand*>(cmd)->total_counter);
 }
 
 }  // namespace led_controller_test

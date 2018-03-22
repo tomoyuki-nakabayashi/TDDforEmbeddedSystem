@@ -2,11 +2,12 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <command/halt_engine.h>
+#include <stdlib.h>
 
 typedef struct HaltEngineStruct {
   CommandStruct base;
   ActiveObjectEngine engine;
-};
+} HaltEngineStruct;
 typedef struct HaltEngineStruct *HaltEngine;
 
 static void ExecuteHaltEngine(Command super) {
@@ -14,8 +15,8 @@ static void ExecuteHaltEngine(Command super) {
   FlushEngine(self->engine);
 }
 
-static CommandStruct interface {
-  .CommandExecute = ExecuteHaltEngine
+static CommandInterfaceStruct interface = {
+  .Execute = ExecuteHaltEngine
 };
 
 Command CreateHaltEngine(ActiveObjectEngine engine) {

@@ -22,6 +22,7 @@ add_executable(unittests
     src/detector/timeout_detector.c
     src/drivers/led_driver.c
     src/command/command.c
+    src/command/halt_engine.c
     src/command/led_operator_factory.c
     src/command/action_on_trigger.c
     test/active_object_test.cpp
