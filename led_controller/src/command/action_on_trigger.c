@@ -30,7 +30,7 @@ static void ExecuteActionOnTrigger(Command super) {
   }
 
   if (CheckEvent(self->chain[index]->detector) == DETECTOR_EVENT_DETECTED) {
-    CommandExecute(self->chain[index]->command);
+    FuelEngine(self->engine, self->chain[index]->command);
     CleanupEventDetector(self->chain[index]->detector);
     self->index++;
     self->index_started = false;
