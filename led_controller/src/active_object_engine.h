@@ -17,6 +17,7 @@ ActiveObjectEngine CreateActiveObjectEngine();
 void DestroyActiveObjectEngine(ActiveObjectEngine engine);
 void FuelEngine(ActiveObjectEngine engine, Command cmd);
 void EngineRuns(ActiveObjectEngine engine);
+void FlushEngine(ActiveObjectEngine engine);
 
 #ifdef __cplusplus
 }

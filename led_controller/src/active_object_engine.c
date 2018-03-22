@@ -35,3 +35,9 @@ void EngineRuns(ActiveObjectEngine engine) {
     engine->commands = g_slist_remove(engine->commands, (gpointer)cmd);
   }
 }
+
+void FlushEngine(ActiveObjectEngine engine) {
+  if ((engine == NULL) || (engine->commands == NULL)) return;
+  g_slist_free(engine->commands);
+  engine->commands = g_slist_alloc();
+}
