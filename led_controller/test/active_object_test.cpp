@@ -8,7 +8,6 @@
 #include <command/action_on_trigger.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
-#include <operator/operator.h>
 
 namespace led_controller_test {
 
@@ -40,24 +39,24 @@ static EventDetector CreateEvenCountDetector() {
   return reinterpret_cast<EventDetector>(detector);
 }
 
-typedef struct CountOperator {
-  OperatorStruct base;
+typedef struct CountCommand {
+  CommandStruct base;
   int32_t my_data;
-} CountOperator;
+} CountCommand;
 
-static void IncrementCounter(Operator super) {
-  auto self = reinterpret_cast<CountOperator*>(super);
+static void IncrementCounter(Command super) {
+  auto self = reinterpret_cast<CountCommand*>(super);
   self->my_data++;
 }
 
-static OperatorInterfaceStruct count_interface = {
+static CommandInterfaceStruct count_interface = {
   IncrementCounter
 };
 
-static Operator CreateIncrementCounter() {
-  auto op = new CountOperator{};
-  op->base.vtable = &count_interface;
-  return reinterpret_cast<Operator>(op);
+static Command CreateIncrementCounter() {
+  auto command = new CountCommand{};
+  command->base.vtable = &count_interface;
+  return reinterpret_cast<Command>(command);
 }
 
 class ActionOnTriggerTest : public ::testing::Test {
@@ -76,7 +75,7 @@ class ActionOnTriggerTest : public ::testing::Test {
 
  protected:
     std::unique_ptr<EventDetectorStruct> detector_;
-    std::unique_ptr<OperatorStruct> op_;
+    std::unique_ptr<CommandStruct> op_;
 };
 
 /* 
@@ -85,10 +84,10 @@ TEST_F(TriggerActionMapTest, AbstractUse) {
 
   auto detector = reinterpret_cast<EventDetector>(new EvenCountDetector{});
   detector->vtable = &even_interface;
-  auto op = reinterpret_cast<Operator>(new CountOperator{});
-  op->vtable = &count_interface;
+  auto command = reinterpret_cast<Command>(new CountCommand{});
+  command->vtable = &count_interface;
 
-  auto count_even_value = CreateTriggerActionPair(detector, op);
+  auto count_even_value = CreateTriggerActionPair(detector, command);
 
   g_array_append_val(action_trigger_array, count_even_value);
   g_array_append_val(action_trigger_array, count_even_value);
@@ -111,7 +110,7 @@ TEST_F(ActionOnTriggerTest, ActionOnTriggerPieceOfChain) {
   CommandExecute(chained_cmd);
   CommandExecute(chained_cmd);
 
-  EXPECT_EQ(1, reinterpret_cast<CountOperator*>(op_.get())->my_data);
+  EXPECT_EQ(1, reinterpret_cast<CountCommand*>(op_.get())->my_data);
 
   DestroyTriggerActionPair(count_even_value);
   DestroyActionOnTriggerChain(chained_cmd);
@@ -126,7 +125,7 @@ TEST_F(ActionOnTriggerTest, ChainReachesNull) {
   for (auto i = 0; i < 4; ++i)
     CommandExecute(chained_cmd);
 
-  EXPECT_EQ(1, reinterpret_cast<CountOperator*>(op_.get())->my_data);
+  EXPECT_EQ(1, reinterpret_cast<CountCommand*>(op_.get())->my_data);
 
   DestroyTriggerActionPair(count_even_value);
   DestroyActionOnTriggerChain(chained_cmd);
@@ -156,7 +155,7 @@ TEST_F(ActionOnTriggerTest, ChainHasTwoCommands) {
   for (auto i = 0; i < 4; ++i)
     CommandExecute(chained_cmd);
 
-  EXPECT_EQ(2, reinterpret_cast<CountOperator*>(op_.get())->my_data);
+  EXPECT_EQ(2, reinterpret_cast<CountCommand*>(op_.get())->my_data);
   EXPECT_EQ(0, reinterpret_cast<EvenCountDetector*>(detector_.get())->my_data);
 
   DestroyTriggerActionPair(count_even_value);
@@ -206,7 +205,7 @@ class ActiveObjectEngineTest : public ::testing::Test {
 
  protected:
     std::unique_ptr<EventDetectorStruct> detector_;
-    std::unique_ptr<OperatorStruct> op_;
+    std::unique_ptr<CommandStruct> op_;
     TriggerActionPair count_even_;
     TriggerActionPair *actions_;
 };
@@ -247,7 +246,7 @@ TEST_F(ActiveObjectEngineTest, FuelActionOnTrigger) {
   FuelEngine(engine, cmd);
   EngineRuns(engine);
 
-  EXPECT_EQ(2, reinterpret_cast<CountOperator*>(op_.get())->my_data);
+  EXPECT_EQ(2, reinterpret_cast<CountCommand*>(op_.get())->my_data);
 }
 
 }  // namespace led_controller_test

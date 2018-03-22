@@ -52,6 +52,7 @@
 ## Operator
 
 - [x] Extract Operator interface.
+- [ ] Integrate to Command.
 
 ## Command
 

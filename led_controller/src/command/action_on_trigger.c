@@ -7,7 +7,7 @@
 
 typedef struct TriggerActionPairStruct {
   EventDetector detector;
-  Operator op;
+  Command command;
 } TriggerActionPairStruct;
 
 typedef struct ActionOnTriggerChainStruct {
@@ -30,7 +30,7 @@ static void ExecuteActionOnTrigger(Command super) {
   }
 
   if (CheckEvent(self->chain[index]->detector) == DETECTOR_EVENT_DETECTED) {
-    TriggerOperation(self->chain[index]->op);
+    CommandExecute(self->chain[index]->command);
     CleanupEventDetector(self->chain[index]->detector);
     self->index++;
     self->index_started = false;
@@ -43,10 +43,10 @@ static CommandInterfaceStruct interface = {
   .Execute = ExecuteActionOnTrigger
 };
 
-TriggerActionPair CreateTriggerActionPair(EventDetector detector, Operator op) {
+TriggerActionPair CreateTriggerActionPair(EventDetector detector, Command command) {
   TriggerActionPair pair = calloc(1, sizeof(TriggerActionPairStruct));
   pair->detector = detector;
-  pair->op = op;
+  pair->command = command;
   return pair;
 }
 

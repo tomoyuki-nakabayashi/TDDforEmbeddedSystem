@@ -10,8 +10,7 @@
 #include <detector/key_input_detector.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
-#include <operator/operator.h>
-#include <operator/led_operator_factory.h>
+#include <command/led_operator_factory.h>
 #include <drivers/led_driver.h>
 #include <utils/logger.h>
 
@@ -32,8 +31,8 @@ int main(void) {
   // Create components.
   EventDetector press_a = CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA);
   EventDetector five_sec_timeout = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
-  Operator caps_on = LedOperatorFactory(caps_led, OP_LED_TURN_ON);
-  Operator caps_off = LedOperatorFactory(caps_led, OP_LED_TURN_OFF);
+  Command caps_on = LedOperatorFactory(caps_led, OP_LED_TURN_ON);
+  Command caps_off = LedOperatorFactory(caps_led, OP_LED_TURN_OFF);
 
   TriggerActionPair actions[NUM_OPERATION_ON_DETECTION+1];
   actions[0] = CreateTriggerActionPair(press_a, caps_on);

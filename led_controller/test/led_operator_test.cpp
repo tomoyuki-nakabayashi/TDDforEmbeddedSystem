@@ -2,8 +2,8 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <gmock/gmock.h>
-#include <operator/operator.h>
-#include <operator/led_operator_factory.h>
+#include <command/command.h>
+#include <command/led_operator_factory.h>
 #include <drivers/led_driver.h>
 #include <os/mock_io.h>
 
@@ -34,39 +34,39 @@ class LedOperatorTest : public ::testing::Test {
 };
 
 TEST_F(LedOperatorTest, LedTrunOnOperationCallsIoWriteWithOne) {
-  Operator op = LedOperatorFactory(driver_, OP_LED_TURN_ON);
+  Command command = LedOperatorFactory(driver_, OP_LED_TURN_ON);
   EXPECT_CALL(*mock_io, IO_WRITE(kFd, StrEq("1\n"), 2)).Times(1);
-  TriggerOperation(op);
+  CommandExecute(command);
 }
 
 TEST_F(LedOperatorTest, FatoryReturnsNullIfFailed) {
-  Operator op = LedOperatorFactory(nullptr, OP_LED_TURN_ON);
-  EXPECT_EQ(nullptr, op);
+  Command command = LedOperatorFactory(nullptr, OP_LED_TURN_ON);
+  EXPECT_EQ(nullptr, command);
 
-  op = LedOperatorFactory(driver_, -1);
-  EXPECT_EQ(nullptr, op);
+  command = LedOperatorFactory(driver_, -1);
+  EXPECT_EQ(nullptr, command);
 
-  op = LedOperatorFactory(driver_, OP_MAX_FACTORY_ID);
-  EXPECT_EQ(nullptr, op);
+  command = LedOperatorFactory(driver_, OP_MAX_FACTORY_ID);
+  EXPECT_EQ(nullptr, command);
 }
 
 TEST_F(LedOperatorTest, LedTrunOffOperationCallsIoWriteWithZero) {
-  Operator op = LedOperatorFactory(driver_, OP_LED_TURN_OFF);
+  Command command = LedOperatorFactory(driver_, OP_LED_TURN_OFF);
   EXPECT_CALL(*mock_io, IO_WRITE(kFd, StrEq("0\n"), 2)).Times(1);
-  TriggerOperation(op);
+  CommandExecute(command);
 }
 
 TEST_F(LedOperatorTest, LedToggleOperationTogglesIoWrite) {
-  Operator op = LedOperatorFactory(driver_, OP_LED_TOGGLE);
+  Command command = LedOperatorFactory(driver_, OP_LED_TOGGLE);
 
   InSequence s;
   EXPECT_CALL(*mock_io, IO_WRITE(kFd, StrEq("1\n"), 2)).Times(1);
   EXPECT_CALL(*mock_io, IO_WRITE(kFd, StrEq("0\n"), 2)).Times(1);
   EXPECT_CALL(*mock_io, IO_WRITE(kFd, StrEq("1\n"), 2)).Times(1);
 
-  TriggerOperation(op);
-  TriggerOperation(op);
-  TriggerOperation(op);
+  CommandExecute(command);
+  CommandExecute(command);
+  CommandExecute(command);
 }
 
 }  //  namespace led_controller_test

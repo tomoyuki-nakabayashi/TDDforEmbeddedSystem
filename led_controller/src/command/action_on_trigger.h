@@ -11,12 +11,11 @@ extern "C" {
 #include <command/command.h>
 #include <active_object_engine.h>
 #include <detector/event_detector.h>
-#include <operator/operator.h>
 
 struct TriggerActionPairStruct;
 typedef struct TriggerActionPairStruct *TriggerActionPair;
 
-TriggerActionPair CreateTriggerActionPair(EventDetector detector, Operator op);
+TriggerActionPair CreateTriggerActionPair(EventDetector detector, Command command);
 void DestroyTriggerActionPair(TriggerActionPair trigger_action);
 // chain must be null terminated.
 Command CreateActionOnTriggerChain(TriggerActionPair *chain,

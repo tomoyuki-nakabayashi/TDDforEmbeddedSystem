@@ -8,16 +8,16 @@
 extern "C" {
 #endif
 
-typedef struct OperatorInterfaceStruct *OperatorInterface;
+typedef struct CommandInterfaceStruct *OperatorInterface;
 typedef struct OperatorStruct *Operator;
 
 typedef struct OperatorStruct {
   OperatorInterface vtable;
 } OperatorStruct;
 
-typedef struct OperatorInterfaceStruct {
+typedef struct CommandInterfaceStruct {
   void (*Operate)(Operator);
-} OperatorInterfaceStruct;
+} CommandInterfaceStruct;
 
 void TriggerOperation(Operator op);
 

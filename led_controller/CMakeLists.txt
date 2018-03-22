@@ -5,12 +5,11 @@ add_executable(led_controller
     src/main.c
     src/active_object_engine.c
     src/command/command.c
+    src/command/led_operator_factory.c
     src/command/action_on_trigger.c
     src/detector/event_detector.c
     src/detector/key_input_detector.c
     src/detector/timeout_detector.c
-    src/operator/operator.c
-    src/operator/led_operator_factory.c
     src/drivers/led_driver.c
     src/utils/logger.c
     src/os/io.c
@@ -22,9 +21,8 @@ add_executable(unittests
     src/detector/key_input_detector.c
     src/detector/timeout_detector.c
     src/drivers/led_driver.c
-    src/operator/operator.c
-    src/operator/led_operator_factory.c
     src/command/command.c
+    src/command/led_operator_factory.c
     src/command/action_on_trigger.c
     test/active_object_test.cpp
     test/key_input_event_test.cpp

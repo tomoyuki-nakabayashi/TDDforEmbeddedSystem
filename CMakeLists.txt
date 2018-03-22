@@ -42,7 +42,8 @@ endif()
 # Add libevdev
 find_package(PkgConfig)
 pkg_check_modules(LIBEVDEV REQUIRED libevdev)
-include_directories(${LIBEVDEV_INCLUDE_DIRS})
+pkg_check_modules(GLIB REQUIRED glib-2.0)
+include_directories(${LIBEVDEV_INCLUDE_DIRS} ${GLIB_INCLUDE_DIRS})
 
 add_subdirectory(evdev_test)
 add_subdirectory(bad_example)
