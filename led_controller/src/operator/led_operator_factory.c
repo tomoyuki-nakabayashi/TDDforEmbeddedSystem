@@ -40,3 +40,7 @@ Operator LedOperatorFactory(LedDriver driver, int32_t op_id) {
   op->base.vtable = &interface[op_id];
   op->driver = driver;
 }
+
+void DestroyLedOperator(Operator super) {
+  free(self);
+}

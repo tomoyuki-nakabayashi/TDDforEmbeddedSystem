@@ -29,15 +29,15 @@ int main(void) {
     exit(1);
   }
 
+  // Create components.
+  EventDetector press_a = CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA);
+  EventDetector five_sec_timeout = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
+  Operator caps_on = LedOperatorFactory(caps_led, OP_LED_TURN_ON);
+  Operator caps_off = LedOperatorFactory(caps_led, OP_LED_TURN_OFF);
+
   TriggerActionPair actions[NUM_OPERATION_ON_DETECTION+1];
-  // "A" press triggers CAPS LED turn on.
-  actions[0] = CreateTriggerActionPair(
-                  CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA),
-                  LedOperatorFactory(caps_led, OP_LED_TURN_ON));
-  // 5 sec timeout triggers CAPS LED turn off.
-  actions[1] = CreateTriggerActionPair(
-                  CreateTimeOutDetector(5000, TIMER_ONE_SHOT),
-                  LedOperatorFactory(caps_led, OP_LED_TURN_OFF));
+  actions[0] = CreateTriggerActionPair(press_a, caps_on);
+  actions[1] = CreateTriggerActionPair(five_sec_timeout, caps_off);
   actions[2] = NULL;  // null-termination.
 
   ActiveObjectEngine engine = CreateActiveObjectEngine();
@@ -47,6 +47,14 @@ int main(void) {
   EngineRuns(engine);
 
   // Need cleanup.
+  DestroyActionOnTriggerChain(cmd);
+  DestroyActiveObjectEngine(engine);
+  DestroyTriggerActionPair(actions[0]);
+  DestroyTriggerActionPair(actions[1]);
+  DestroyLedOperator(caps_on);
+  DestroyLedOperator(caps_off);
+  DestroyKeyInputDetector(press_a);
+  DestroyTimeOutDetector(five_sec_timeout);
   CleanupLedDriver(caps_led);
   DestroyLedDriver(caps_led);
 

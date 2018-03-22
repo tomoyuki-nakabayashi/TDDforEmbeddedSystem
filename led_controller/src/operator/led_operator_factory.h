@@ -20,6 +20,7 @@ enum {
 };
 
 Operator LedOperatorFactory(LedDriver driver, int32_t op_id);
+void DestroyLedOperator(Operator super);
 
 #ifdef __cplusplus
 }
