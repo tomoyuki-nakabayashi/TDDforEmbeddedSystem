@@ -57,8 +57,12 @@
 ## Command
 
 - [x] TriggerActionMap Command
-- [ ] ActionOnTrigger continues infinitly.
+- [x] ActionOnTrigger continues infinitly.
 
 ## Engine control command
 
 - [x] Implement flush by overriding Command interface.
+
+## Detect successive key input
+
+- [ ] Make command.
