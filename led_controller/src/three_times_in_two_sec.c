@@ -35,8 +35,8 @@ int main(void) {
   action_two[0] = CreateTriggerActionPair(two_sec_timeout, halt);
   action_two[1] = NULL;  // null-termination.
 
-  Command cmd_one = CreateActionOnTriggerChain(action_one, engine);
-  Command cmd_two = CreateActionOnTriggerChain(action_two, engine);
+  Command cmd_one = CreateActionOnTriggerChain(action_one, engine, LOOP_CHAIN);
+  Command cmd_two = CreateActionOnTriggerChain(action_two, engine, ONE_SHOT_CHAIN);
   FuelEngine(engine, cmd_one);
   FuelEngine(engine, cmd_two);
 

@@ -40,7 +40,7 @@ int main(void) {
   actions[2] = NULL;  // null-termination.
 
   ActiveObjectEngine engine = CreateActiveObjectEngine();
-  Command cmd = CreateActionOnTriggerChain(actions, engine);
+  Command cmd = CreateActionOnTriggerChain(actions, engine, ONE_SHOT_CHAIN);
   FuelEngine(engine, cmd);
 
   EngineRuns(engine);

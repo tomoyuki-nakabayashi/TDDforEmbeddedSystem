@@ -14,16 +14,26 @@ typedef struct ActionOnTriggerChainStruct {
   CommandStruct base;
   TriggerActionPair *chain;
   ActiveObjectEngine engine;
+  int32_t loop_flag;
   int32_t index;
   bool index_started;
 } ActionOnTriggerChainStruct;
 typedef struct ActionOnTriggerChainStruct *ActionOnTriggerChain;
 
+static bool IsEndOfChain(ActionOnTriggerChain self) {
+  return self->chain[self->index] == NULL;
+}
+
 static void ExecuteActionOnTrigger(Command super) {
   ActionOnTriggerChain self = (ActionOnTriggerChain)super;
-  const int32_t index = self->index;
-  if (self->chain[index] == NULL) return;
+  if (IsEndOfChain(self)) {
+    if (self->loop_flag == ONE_SHOT_CHAIN)
+      return;
+    else
+      self->index = 0;
+  }
 
+  const int32_t index = self->index;
   if (!self->index_started) {
     StartEventDetector(self->chain[index]->detector);
     self->index_started = true;
@@ -56,11 +66,13 @@ void DestroyTriggerActionPair(TriggerActionPair trigger_action) {
 
 // Should give ActiveObjectEngine.
 Command CreateActionOnTriggerChain(TriggerActionPair *chain,
-                                   ActiveObjectEngine engine) {
+                                   ActiveObjectEngine engine,
+                                   int32_t loop_flag) {
   ActionOnTriggerChain aot_chain = calloc(1, sizeof(ActionOnTriggerChainStruct));
   aot_chain->base.vtable = &interface;
   aot_chain->chain = chain;
   aot_chain->engine = engine;
+  aot_chain->loop_flag = loop_flag;
   aot_chain->index = 0;
   aot_chain->index_started = false;
 

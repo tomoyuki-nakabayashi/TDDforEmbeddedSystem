@@ -140,7 +140,7 @@ TEST_F(ActiveObjectEngineTest, MultipleCommandsTest) {
 
 TEST_F(ActiveObjectEngineTest, FuelActionOnTrigger) {
   auto engine = CreateActiveObjectEngine();
-  auto cmd = CreateActionOnTriggerChain(actions_, engine);
+  auto cmd = CreateActionOnTriggerChain(actions_, engine, ONE_SHOT_CHAIN);
   FuelEngine(engine, cmd);
   EngineRuns(engine);
 
