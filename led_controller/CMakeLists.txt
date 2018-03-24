@@ -22,8 +22,15 @@ add_executable(led_controller
     src/os/io.c
     src/os/time.c)
 
-    add_executable(three_times_in_two_sec
+add_executable(three_times_in_two_sec
     src/three_times_in_two_sec.c
+    ${common_src}
+    src/utils/logger.c
+    src/os/io.c
+    src/os/time.c)
+
+    add_executable(konami_command
+    src/konami_command.c
     ${common_src}
     src/utils/logger.c
     src/os/io.c
@@ -42,4 +49,5 @@ add_executable(unittests
 
 target_link_libraries(led_controller ${LIBEVDEV_LIBRARIES} ${GLIB_LIBRARIES})
 target_link_libraries(three_times_in_two_sec ${LIBEVDEV_LIBRARIES} ${GLIB_LIBRARIES})
+target_link_libraries(konami_command ${LIBEVDEV_LIBRARIES} ${GLIB_LIBRARIES})
 target_link_libraries(unittests gmock_main ${GLIB_LIBRARIES})
