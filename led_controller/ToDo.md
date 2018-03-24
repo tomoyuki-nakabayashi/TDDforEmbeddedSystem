@@ -65,4 +65,5 @@
 
 ## Detect successive key input
 
-- [ ] Make command.
+- [x] Make command.
+- [x] DetectionChainCommand.

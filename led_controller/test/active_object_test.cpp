@@ -7,6 +7,7 @@
 #include <command/command.h>
 #include <command/halt_engine.h>
 #include <command/action_on_trigger.h>
+#include <command/detect_chain.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
 
@@ -155,6 +156,19 @@ TEST_F(ActiveObjectEngineTest, HaltEngine) {
   FuelEngine(engine, cmd);
   FuelEngine(engine, halt);
   FuelEngine(engine, cmd);
+  EngineRuns(engine);
+
+  EXPECT_EQ(1, reinterpret_cast<TotalCountCommand*>(cmd)->total_counter);
+}
+
+TEST_F(ActiveObjectEngineTest, DetectChain) {
+  auto engine = CreateActiveObjectEngine();
+  auto even = CreateEvenCountDetector();
+  auto cmd = CreateTotalCount();
+  auto count_on_even = CreateDetectChain(even, engine, cmd);
+  auto count_on_four = CreateDetectChain(even, engine, count_on_even);
+
+  FuelEngine(engine, count_on_four);
   EngineRuns(engine);
 
   EXPECT_EQ(1, reinterpret_cast<TotalCountCommand*>(cmd)->total_counter);
