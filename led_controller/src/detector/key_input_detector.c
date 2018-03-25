@@ -23,19 +23,22 @@ static bool HasPendingEvent(struct libevdev *evdev, struct input_event *ev) {
           == LIBEVDEV_READ_STATUS_SUCCESS;
 }
 
-static bool IsTargetEvent(const struct input_event *target,
-                          const struct input_event *ev) {
-  return (target->type == ev->type
-       && target->code == ev->code
-       && target->value == ev->value);
+static int ClassifyPendingEvent(const struct input_event *target,
+                                const struct input_event *ev) {
+  // The pending event is not target event.
+  if (target->type != ev->type || target->value != ev->value)
+    return DETECTOR_EVENT_NOT_DETECTED;
+
+  return (target->code == ev->code) ?
+    DETECTOR_EVENT_DETECTED : DETECOTR_UNEXPECTED_EVENT;
 }
 
 static int CheckKeyInputEvent(EventDetector base) {
   KeyInputDetector self = (KeyInputDetector)base;
   if (self == NULL || self->evdev == NULL) return DETECTOR_ERROR;
   struct input_event ev = {};
-  if (HasPendingEvent(self->evdev, &ev) && IsTargetEvent(&self->target_event, &ev)) {
-    return DETECTOR_EVENT_DETECTED;
+  if (HasPendingEvent(self->evdev, &ev)) {
+    return ClassifyPendingEvent(&self->target_event, &ev);
   }
   return DETECTOR_EVENT_NOT_DETECTED;
 }

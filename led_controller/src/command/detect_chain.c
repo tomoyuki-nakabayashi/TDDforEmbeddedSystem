@@ -17,17 +17,21 @@ typedef struct DetectChainStruct *DetectChain;
 static void DetectChainExecute(Command super) {
   DetectChain self = (DetectChain)super;
 
-  if(!self->detector_started) {
+  if (!self->detector_started) {
     self->detector_started = true;
     StartEventDetector(self->detector);
   }
 
-  if(CheckEvent(self->detector) == DETECTOR_EVENT_DETECTED) {
+  int rc = CheckEvent(self->detector);
+  if (rc == DETECTOR_EVENT_DETECTED) {
     FuelEngine(self->engine, self->wakeup);
     self->detector_started = false;
     CleanupEventDetector(self->detector);
-  } else {
+  } else if (rc == DETECTOR_EVENT_NOT_DETECTED) {
     FuelEngine(self->engine, (Command)self);
+  } else {
+    self->detector_started = false;
+    CleanupEventDetector(self->detector);
   }
 }
 

@@ -192,7 +192,7 @@ TEST_F(KeyInputEventDetectionTest, DetectOnlyInterestedEvent) {
     .WillOnce(DoAll(SetArgPointee<2>(kPressA), Return(kSuccess)));
 
   EXPECT_EQ(DETECTOR_EVENT_NOT_DETECTED, CheckEvent(dev_));
-  EXPECT_EQ(DETECTOR_EVENT_NOT_DETECTED, CheckEvent(dev_));
+  EXPECT_EQ(DETECOTR_UNEXPECTED_EVENT, CheckEvent(dev_));
   EXPECT_EQ(DETECTOR_EVENT_NOT_DETECTED, CheckEvent(dev_));
   EXPECT_EQ(DETECTOR_EVENT_DETECTED, CheckEvent(dev_));
 }
