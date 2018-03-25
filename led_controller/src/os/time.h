@@ -10,7 +10,7 @@ extern "C" {
 
 #include <stdint.h>
 
-uint64_t GET_MSEC_OF_DAY();
+uint32_t GET_MSEC_OF_DAY();
 
 #ifdef __cplusplus
 }

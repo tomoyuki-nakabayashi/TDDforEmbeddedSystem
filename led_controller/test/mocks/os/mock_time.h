@@ -10,13 +10,13 @@
 
 class MOCK_TIME {
  public:
-    MOCK_METHOD0(GET_MSEC_OF_DAY, uint64_t(void));
+    MOCK_METHOD0(GET_MSEC_OF_DAY, uint32_t(void));
 };
 
 extern MOCK_TIME *mock_time;
 
 extern "C" {
-  uint64_t GET_MSEC_OF_DAY() {
+  uint32_t GET_MSEC_OF_DAY() {
     return mock_time->GET_MSEC_OF_DAY();
   }
 }

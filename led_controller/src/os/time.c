@@ -5,8 +5,8 @@
 #include <sys/time.h>
 #include <stddef.h>
 
-uint64_t GET_MSEC_OF_DAY() {
+uint32_t GET_MSEC_OF_DAY() {
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  return (uint64_t)((tv.tv_sec*1000) + (tv.tv_usec*0.001));
+  return (uint32_t)((tv.tv_sec*1000) + (tv.tv_usec*0.001));
 }
