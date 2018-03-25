@@ -48,20 +48,11 @@ int main(void) {
   Command uuddlr = CreateDetectChain(press_right, engine, uuddlrl);
   Command uuddl = CreateDetectChain(press_left, engine, uuddlr);
   Command uudd = CreateDetectChain(press_down, engine, uuddl);
-  Command uud = CreateDetectChain(press_up, engine, uudd);
+  Command uud = CreateDetectChain(press_down, engine, uudd);
   Command uu = CreateDetectChain(press_up, engine, uud);
   Command start = CreateDetectChain(press_up, engine, uu);
 
   FuelEngine(engine, start);
-  FuelEngine(engine, uu);
-  FuelEngine(engine, uud);
-  FuelEngine(engine, uudd);
-  FuelEngine(engine, uuddl);
-  FuelEngine(engine, uuddlr);
-  FuelEngine(engine, uuddlrl);
-  FuelEngine(engine, uuddlrlr);
-  FuelEngine(engine, uuddlrlrb);
-  FuelEngine(engine, acceptted);
 
   EngineRuns(engine);
 
