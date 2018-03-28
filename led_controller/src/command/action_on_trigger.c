@@ -12,38 +12,28 @@ typedef struct TriggerActionPairStruct {
 
 typedef struct ActionOnTriggerChainStruct {
   CommandStruct base;
-  TriggerActionPair *chain;
+  TriggerActionPair chain;
   ActiveObjectEngine engine;
   int32_t loop_flag;
   int32_t index;
-  bool index_started;
+  bool started;
 } ActionOnTriggerChainStruct;
 typedef struct ActionOnTriggerChainStruct *ActionOnTriggerChain;
 
-static bool IsEndOfChain(ActionOnTriggerChain self) {
-  return self->chain[self->index] == NULL;
-}
-
 static void ExecuteActionOnTrigger(Command super) {
   ActionOnTriggerChain self = (ActionOnTriggerChain)super;
-  if (IsEndOfChain(self)) {
+
+  if (!self->started) {
+    StartEventDetector(self->chain->detector);
+    self->started = true;
+  }
+
+  if (CheckEvent(self->chain->detector) == DETECTOR_EVENT_DETECTED) {
+    FuelEngine(self->engine, self->chain->command);
+    CleanupEventDetector(self->chain->detector);
+    self->started = false;
     if (self->loop_flag == ONE_SHOT_CHAIN)
-      return;
-    else
-      self->index = 0;
-  }
-
-  const int32_t index = self->index;
-  if (!self->index_started) {
-    StartEventDetector(self->chain[index]->detector);
-    self->index_started = true;
-  }
-
-  if (CheckEvent(self->chain[index]->detector) == DETECTOR_EVENT_DETECTED) {
-    FuelEngine(self->engine, self->chain[index]->command);
-    CleanupEventDetector(self->chain[index]->detector);
-    self->index++;
-    self->index_started = false;
+      return;  // Finish this chain by avoiding FuelEngine().
   }
 
   FuelEngine(self->engine, (Command)self);
@@ -65,18 +55,17 @@ void DestroyTriggerActionPair(TriggerActionPair trigger_action) {
 }
 
 // Should give ActiveObjectEngine.
-Command CreateActionOnTriggerChain(TriggerActionPair *chain,
+Command CreateActionOnTriggerChain(TriggerActionPair chain,
                                    ActiveObjectEngine engine,
                                    int32_t loop_flag) {
-  ActionOnTriggerChain aot_chain = calloc(1, sizeof(ActionOnTriggerChainStruct));
-  aot_chain->base.vtable = &interface;
-  aot_chain->chain = chain;
-  aot_chain->engine = engine;
-  aot_chain->loop_flag = loop_flag;
-  aot_chain->index = 0;
-  aot_chain->index_started = false;
+  ActionOnTriggerChain self = calloc(1, sizeof(ActionOnTriggerChainStruct));
+  self->base.vtable = &interface;
+  self->chain = chain;
+  self->engine = engine;
+  self->loop_flag = loop_flag;
+  self->started = false;
 
-  return (Command)aot_chain;
+  return (Command)self;
 }
 
 void DestroyActionOnTriggerChain(Command super) {

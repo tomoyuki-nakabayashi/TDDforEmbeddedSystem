@@ -25,18 +25,16 @@ int main(void) {
 
   // Create components.
   EventDetector press_a = CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA);
-  EventDetector two_sec_timeout = CreateTimeOutDetector(2000, TIMER_ONE_SHOT);
+  EventDetector two_sec = CreateTimeOutDetector(2000, TIMER_ONE_SHOT);
   Command total = CreateCountTotal();
   Command halt = CreateHaltEngine(engine);
 
-  TriggerActionPair action_one[2], action_two[2];
-  action_one[0] = CreateTriggerActionPair(press_a, total);
-  action_one[1] = NULL;  // null-termination.
-  action_two[0] = CreateTriggerActionPair(two_sec_timeout, halt);
-  action_two[1] = NULL;  // null-termination.
+  // null-terminated
+  TriggerActionPair one = CreateTriggerActionPair(press_a, total);
+  TriggerActionPair two = CreateTriggerActionPair(two_sec, halt);
 
-  Command cmd_one = CreateActionOnTriggerChain(action_one, engine, LOOP_CHAIN);
-  Command cmd_two = CreateActionOnTriggerChain(action_two, engine, ONE_SHOT_CHAIN);
+  Command cmd_one = CreateActionOnTriggerChain(one, engine, LOOP_CHAIN);
+  Command cmd_two = CreateActionOnTriggerChain(two, engine, ONE_SHOT_CHAIN);
   FuelEngine(engine, cmd_one);
   FuelEngine(engine, cmd_two);
 
@@ -48,10 +46,10 @@ int main(void) {
   DestroyActionOnTriggerChain(cmd_one);
   DestroyActionOnTriggerChain(cmd_two);
   DestroyActiveObjectEngine(engine);
-  DestroyTriggerActionPair(action_one[0]);
-  DestroyTriggerActionPair(action_two[0]);
+  DestroyTriggerActionPair(one);
+  DestroyTriggerActionPair(two);
   DestroyKeyInputDetector(press_a);
-  DestroyTimeOutDetector(two_sec_timeout);
+  DestroyTimeOutDetector(two_sec);
 
   return 0;
 }

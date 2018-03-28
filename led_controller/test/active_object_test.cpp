@@ -91,14 +91,9 @@ class ActiveObjectEngineTest : public ::testing::Test {
     }
 
     void SetUp() override {
-      actions_ = new TriggerActionPair[3];
-      actions_[0] = count_even_;
-      actions_[1] = count_even_;
-      actions_[2] = nullptr;
     }
 
     void TearDown() override {
-      delete[] actions_;
       DestroyTriggerActionPair(count_even_);
     }
 
@@ -106,7 +101,6 @@ class ActiveObjectEngineTest : public ::testing::Test {
     std::unique_ptr<EventDetectorStruct> detector_;
     std::unique_ptr<CommandStruct> op_;
     TriggerActionPair count_even_;
-    TriggerActionPair *actions_;
 };
 /* 
 TEST_F(ActiveObjectEngineTest, AbstractUse) {
@@ -141,11 +135,11 @@ TEST_F(ActiveObjectEngineTest, MultipleCommandsTest) {
 
 TEST_F(ActiveObjectEngineTest, FuelActionOnTrigger) {
   auto engine = CreateActiveObjectEngine();
-  auto cmd = CreateActionOnTriggerChain(actions_, engine, ONE_SHOT_CHAIN);
+  auto cmd = CreateActionOnTriggerChain(count_even_, engine, ONE_SHOT_CHAIN);
   FuelEngine(engine, cmd);
   EngineRuns(engine);
 
-  EXPECT_EQ(2, reinterpret_cast<CountCommand*>(op_.get())->my_data);
+  EXPECT_EQ(1, reinterpret_cast<CountCommand*>(op_.get())->my_data);
 }
 
 TEST_F(ActiveObjectEngineTest, HaltEngine) {

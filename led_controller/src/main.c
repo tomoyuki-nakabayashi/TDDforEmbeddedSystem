@@ -4,9 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <active_object_engine.h>
 #include <command/command.h>
-#include <command/action_on_trigger.h>
 #include <detector/key_input_detector.h>
 #include <detector/event_detector.h>
 #include <detector/timeout_detector.h>
@@ -29,31 +27,26 @@ int main(void) {
   }
 
   // Create components.
-  EventDetector press_a = CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA);
-  EventDetector five_sec_timeout = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
-  Command caps_on = LedOperatorFactory(caps_led, OP_LED_TURN_ON);
-  Command caps_off = LedOperatorFactory(caps_led, OP_LED_TURN_OFF);
+  EventDetector detectors[NUM_OPERATION_ON_DETECTION];
+  detectors[0] = CreateKeyInputDetector(KEYBOARD_DEVICE, &kPressA);
+  detectors[1] = CreateTimeOutDetector(5000, TIMER_ONE_SHOT);
 
-  TriggerActionPair actions[NUM_OPERATION_ON_DETECTION+1];
-  actions[0] = CreateTriggerActionPair(press_a, caps_on);
-  actions[1] = CreateTriggerActionPair(five_sec_timeout, caps_off);
-  actions[2] = NULL;  // null-termination.
+  Command operators[NUM_OPERATION_ON_DETECTION];
+  operators[0] = LedOperatorFactory(caps_led, OP_LED_TURN_ON);
+  operators[1] = LedOperatorFactory(caps_led, OP_LED_TURN_OFF);
 
-  ActiveObjectEngine engine = CreateActiveObjectEngine();
-  Command cmd = CreateActionOnTriggerChain(actions, engine, ONE_SHOT_CHAIN);
-  FuelEngine(engine, cmd);
+  for(int i = 0; i < NUM_OPERATION_ON_DETECTION; i++) {
+    StartEventDetector(detectors[i]);
+    while(CheckEvent(detectors[i]) != DETECTOR_EVENT_DETECTED) {}
 
-  EngineRuns(engine);
+    CommandExecute(operators[i]);
+  }
 
   // Need cleanup.
-  DestroyActionOnTriggerChain(cmd);
-  DestroyActiveObjectEngine(engine);
-  DestroyTriggerActionPair(actions[0]);
-  DestroyTriggerActionPair(actions[1]);
-  DestroyLedOperator(caps_on);
-  DestroyLedOperator(caps_off);
-  DestroyKeyInputDetector(press_a);
-  DestroyTimeOutDetector(five_sec_timeout);
+  DestroyLedOperator(detectors[0]);
+  DestroyLedOperator(detectors[1]);
+  DestroyKeyInputDetector(operators[0]);
+  DestroyTimeOutDetector(operators[1]);
   CleanupLedDriver(caps_led);
   DestroyLedDriver(caps_led);
 

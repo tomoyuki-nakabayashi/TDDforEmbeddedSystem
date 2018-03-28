@@ -21,7 +21,7 @@ enum {LOOP_CHAIN, ONE_SHOT_CHAIN};
 TriggerActionPair CreateTriggerActionPair(EventDetector detector, Command command);
 void DestroyTriggerActionPair(TriggerActionPair trigger_action);
 // chain must be null terminated.
-Command CreateActionOnTriggerChain(TriggerActionPair *chain,
+Command CreateActionOnTriggerChain(TriggerActionPair chain,
                                    ActiveObjectEngine engine,
                                    int32_t loop_flag);
 void DestroyActionOnTriggerChain(Command super);
