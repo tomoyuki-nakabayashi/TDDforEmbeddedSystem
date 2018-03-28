@@ -29,7 +29,6 @@ int main(void) {
   Command total = CreateCountTotal();
   Command halt = CreateHaltEngine(engine);
 
-  // null-terminated
   TriggerActionPair one = CreateTriggerActionPair(press_a, total);
   TriggerActionPair two = CreateTriggerActionPair(two_sec, halt);
 
